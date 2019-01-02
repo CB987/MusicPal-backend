@@ -19,7 +19,7 @@ create table events (
 create table user_shows (
     id serial primary key,
     user_id integer references users (id),
-    event_id integer references events (id),
+    event_id integer references events (id)
 );
 
 create table friends (
