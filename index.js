@@ -4,4 +4,6 @@ const db = require('./models/db');
 
 const Event = require('./models/Event');
 
-Event.getByArtist('Sylvan Esso');
+// Event.getByArtist('amelia');
+
+Event.getByLocation('atlanta');
