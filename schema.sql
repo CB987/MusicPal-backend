@@ -9,10 +9,9 @@ create table users (
 
 create table events (
     id serial primary key,
-    band text,
+    artist text,
     venue text,
-    city text,
-    state varchar(2),
+    location text,
     date DATE
 );
 
