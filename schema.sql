@@ -4,7 +4,12 @@ create table users (
     username varchar(20),
     email varchar(50),
     city text,
-    state varchar(2),
+    state varchar(2)
+);
+
+create table artists (
+    id serial primary key,
+    name text
 );
 
 create table events (
@@ -21,15 +26,14 @@ create table user_shows (
     event_id integer references events (id)
 );
 
-create table friends (
+create table user_friends (
     id serial primary key,
     user_id integer references users (id),
     friend_id integer references users (id)
 );
 
-create table artists (
+create table user_artists (
     id serial primary key,
-    name text,
-    user_id integer references users(id),
-    event_id integer references events (id),
-)
+    artist_id integer references artists (id),
+    fan_id integer references users (id)
+);
