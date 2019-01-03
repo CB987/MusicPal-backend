@@ -15,8 +15,9 @@ insert into events (
     location,
     date
 ) values 
-('Sylvan Esso', 'Tabernacle', 'Atlanta, GA', '2019-06-05'),
-('Amelia', 'Roxy', 'Portland, OR', '2020-01-01');
+('Sylvan Esso', 'Tabernacle', 'Atlanta GA', '2019-06-05'),
+('Amelia', 'Roxy', 'Portland OR', '2020-01-01'),
+('Drake', 'Statefarm Arena', 'Atlanta GA', '2018-11-16');
 
 insert into user_shows (
     user_id,

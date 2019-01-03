@@ -13,3 +13,12 @@ const User = require('./models/User');
 
 // User.getUserById(1);
 // User.getUsersGoingToShow(2);
+
+const Event = require('./models/Event');
+
+// Event.getByArtist('amelia');
+
+// Event.getByLocation('atlanta');
+
+Event.getShowsForUser(1);
+
