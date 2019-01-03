@@ -6,4 +6,6 @@ const Event = require('./models/Event');
 
 // Event.getByArtist('amelia');
 
-Event.getByLocation('atlanta');
+// Event.getByLocation('atlanta');
+
+Event.getShowsForUser(1);
