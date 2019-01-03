@@ -59,9 +59,13 @@ const Event = require('./models/Event');
 //GET EVENT BY ARTIST
 // Event.getByArtist('amelia');
 
+//GET EVENT BY EVENT ID
+//Event.getEventById(3);
+
 //GET EVENT BY LOCATION
 // Event.getByLocation('atlanta');
 
 //GET EVENTS LIST FOR USER
 // Event.getShowsForUser(1);
+
 

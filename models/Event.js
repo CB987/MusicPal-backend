@@ -12,6 +12,18 @@ class Event {
     // *********************
     // CRUD - RETRIEVE only
     // *********************
+
+    static getEventById(id) {
+        return db.one(`
+        SELECT * from events
+            WHERE id = $1
+        `, [id])
+            .then(result => {
+                const e = new Event(result.id, result.artist, result.venue, result.location, result.date)
+                console.log(e)
+                return e;
+            })
+    }
     
     static getByArtist(artist) {
         return db.any(`
