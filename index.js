@@ -9,7 +9,6 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
 //============
 //USER METHODS
 //============
@@ -22,7 +21,13 @@ const User = require('./models/User');
 // User.getUserById(id);
 
 //GET USERS BY SHOW
-// User.getUsersGoingToShow(id);
+app.get('/showUsers', (req, res) => {
+    User.getUsersGoingToShow(1)
+        .then(shows => {
+            res.send(shows);
+            console.log(shows);
+        })
+})
 
 //UPDATE USER INFO
 // User.getUserById(id)
@@ -66,6 +71,15 @@ const Event = require('./models/Event');
 // Event.getByLocation('atlanta');
 
 //GET EVENTS LIST FOR USER
-// Event.getShowsForUser(1);
+app.get('/upcomingShows', (req, res) => {
+    Event.getShowsForUser(1)
+        .then(shows => {
+            res.send(shows);
+            console.log(shows);
+        });
+});
 
 
+app.listen(5000, () => {
+    console.log('what the hell');
+});
