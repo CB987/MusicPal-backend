@@ -40,7 +40,7 @@ class User {
         `, [id])
             .then(result => {
                 const u = new User(result.id, result.name, result.username, result.email, result.city, result.state);
-                console.log(u);
+                return u;
             })
     }
 
@@ -67,7 +67,7 @@ class User {
                 console.log('almost thre');
                 return usersArray;
             })
-    }
+    };
 
     // static getUsersByGenre(genre) {
     //     return db.any(`
@@ -79,13 +79,46 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo() {
+    updateUserInfo(name, username, email, city, state) {
         return db.result(`
         UPDATE users
             SET name = $2, username = $3, email = $4, city = $5, state = $6
             WHERE id= $1;
-        
-        `)
+        `, [this.id, name, username, email, city, state])
+            .then(result => {
+                console.log(result)
+            })
+    };
+
+    //======
+    //DELETE
+    //======
+    deleteUserFromEvent() {
+        return db.any(`
+        DELETE FROM user_shows 
+            WHERE user_id = $1;
+        `, [this.id]);
+    }
+
+    deleteUserFromFriendsUsers() {
+        return db.any(`
+        DELETE FROM friends 
+            WHERE user_id = $1;
+        `, [this.id]);
+    }
+
+    deleteUserFromFriendsFriends() {
+        return db.any(`
+        DELETE FROM friends 
+            WHERE friend_id = $1;
+        `, [this.id]);
+    }
+
+    deleteUser() {
+        return db.result(`
+        DELETE FROM users
+            WHERE id = $1 ;
+        `, [this.id]);
     }
 }
 
