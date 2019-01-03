@@ -24,6 +24,7 @@ insert into user_shows (
     event_id
 ) values
 (1,1),
+(1,2),
 (2,2);
 
 insert into friends (
