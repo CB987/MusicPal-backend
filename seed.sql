@@ -10,14 +10,13 @@ values
 ('Clare', 'Clare', 'clare@clare.com', 'Mableton', 'GA');
 
 insert into events (
-    band,
+    artist,
     venue,
-    city,
-    state,
+    location,
     date
 ) values 
-('Sylvan Esso', 'Tabernacle', 'Atlanta', 'GA', '2019-06-05'),
-('Amelia', 'Roxy', 'Portland', 'OR', '2020-01-01');
+('Sylvan Esso', 'Tabernacle', 'Atlanta, GA', '2019-06-05'),
+('Amelia', 'Roxy', 'Portland, OR', '2020-01-01');
 
 insert into user_shows (
     user_id,
