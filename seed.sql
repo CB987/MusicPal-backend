@@ -30,8 +30,9 @@ insert into user_shows (
     user_id,
     event_id
 ) values
-('1','1'),
-('1','2'),
+('3','1'),
+('1','3'),
+('3','2'),
 ('2','2');
 
 insert into user_friends (
@@ -43,8 +44,8 @@ insert into user_friends (
 ('2', '3');
 
 insert into user_artists (
-    artist_id,
-    fan_id
+    user_id,
+    artist_id
 ) values 
 ('1', '1'),
 ('1', '3'),

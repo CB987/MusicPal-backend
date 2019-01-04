@@ -34,6 +34,6 @@ create table user_friends (
 
 create table user_artists (
     id serial primary key,
-    artist_id integer references artists (id),
-    fan_id integer references users (id)
+    user_id integer references users (id),
+    artist_id integer references artists (id)
 );

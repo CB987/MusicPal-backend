@@ -31,11 +31,12 @@ app.get('/showUsers', (req, res) => {
 
 //GET FRIENDS BY USER
 app.get('/myFriends', (req, res) => {
-    User.getUserById(1)
-        .then(UserObj => {
-            UserObj.getFriendsOfUser
-        })
-})
+    User.getFriendsOfUser(1)
+        .then(friends => {
+            res.send(friends);
+            console.log(friends);
+        });
+});
 
 //UPDATE USER INFO
 // User.getUserById(id)
