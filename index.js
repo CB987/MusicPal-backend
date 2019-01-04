@@ -18,7 +18,13 @@ const User = require('./models/User');
 // User.add('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA');
 
 //GET USER BY ID
-// User.getUserById(id);
+app.get('/myInfo', (req, res) => {
+    User.getUserById(1)
+        .then(user => {
+            res.send(user);
+            console.log('user info transmitted')
+        })
+})
 
 //GET USERS BY SHOW
 app.get('/showUsers', (req, res) => {
@@ -28,6 +34,15 @@ app.get('/showUsers', (req, res) => {
             console.log(shows);
         })
 })
+
+//GET FRIENDS BY USER
+app.get('/myFriends', (req, res) => {
+    User.getFriendsOfUser(1)
+        .then(friends => {
+            res.send(friends);
+            console.log(friends);
+        });
+});
 
 //UPDATE USER INFO
 // User.getUserById(id)
@@ -54,6 +69,23 @@ app.get('/showUsers', (req, res) => {
 //     .then(userObj => {
 //         userObj.deleteUser();
 //     })
+
+//==============
+//ARTIST METHODS
+//==============
+const Artist = require('./models/Artist');
+
+// ADD ARTIST
+// Artist.add('Meiko');
+
+// GET USER'S FAVORITE ARTISTS
+app.get('/myArtists', (req, res) => {
+    Artist.getArtistsByUser(1)
+        .then(artists => {
+            res.send(artists);
+            console.log(artists);
+        });
+});
 
 
 //=============

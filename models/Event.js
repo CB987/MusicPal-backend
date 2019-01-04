@@ -1,14 +1,14 @@
 const db = require('./db');
 
 class Event {
-    constructor(id, artist, venue, location, date) {
+    constructor(id, artist_id, venue, location, date) {
         this.id = id;
-        this.artist= artist;
+        this.artist_id = artist_id;
         this.venue = venue;
         this.location = location;
         this.date = date;
     }
-    
+
     // *********************
     // CRUD - RETRIEVE only
     // *********************
@@ -19,19 +19,19 @@ class Event {
             WHERE id = $1
         `, [id])
             .then(result => {
-                const e = new Event(result.id, result.artist, result.venue, result.location, result.date)
+                const e = new Event(result.id, result.artist_id, result.venue, result.location, result.date)
                 console.log(e)
                 return e;
             })
     }
-    
+
     static getByArtist(artist) {
         return db.any(`
             select * from events
                 where artist ILIKE '%$1:raw%'
         `, [artist]).then(resultsArray => {
             let artistItems = resultsArray.map(itemObj => {
-                let e = new Event(itemObj.id, itemObj.artist, itemObj.venue, itemObj.location, itemObj.date);
+                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
                 return e;
             });
             console.log(artistItems)
@@ -45,7 +45,7 @@ class Event {
                 where location ILIKE '%$1:raw%'
         `, [location]).then(resultsArray => {
             let locationItems = resultsArray.map(itemObj => {
-                let e = new Event(itemObj.id, itemObj.artist, itemObj.venue, itemObj.location, itemObj.date);
+                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
                 return e;
             });
             console.log(locationItems)
@@ -63,12 +63,17 @@ class Event {
 
                 let eventsArray = await Promise.all(resultsArray.map(async (eventObj) => {
                     return await db.one(`
-            SELECT * FROM events
-            WHERE id = $1
+            SELECT a.name, e.venue, e.location, e.date
+            FROM events e
+            INNER JOIN artists a
+            ON e.artist_id = a.id
+            WHERE e.id = $1
             `, [eventObj.event_id])
                         .then(eventObj => {
-                            let e = new Event(eventObj.id, eventObj.artist, eventObj.venue, eventObj.location, eventObj.date);
-                            // console.log(e);
+                            console.log(eventObj);
+                            let e = new Event(eventObj.id, eventObj.artist_id, eventObj.venue, eventObj.location, eventObj.date);
+                            e.name = eventObj.name;
+                            console.log(e);
                             return e;
                         })
                 }));
