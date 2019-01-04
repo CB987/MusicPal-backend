@@ -64,6 +64,23 @@ app.get('/myFriends', (req, res) => {
 //         userObj.deleteUser();
 //     })
 
+//==============
+//ARTIST METHODS
+//==============
+const Artist = require('./models/Artist');
+
+// ADD ARTIST
+// Artist.add('Meiko');
+
+// GET USER'S FAVORITE ARTISTS
+app.get('/myArtists', (req, res) => {
+    Artist.getArtistsByUser(1)
+        .then(artists => {
+            res.send(artists);
+            console.log(artists);
+        });
+});
+
 
 //=============
 //EVENT METHODS
