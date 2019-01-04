@@ -50,8 +50,7 @@ class Artist {
                     `, [artistObj.artist_id])
                         .then(artistObj => {
                             let a = new Artist(artistObj.id, artistObj.name);
-                            console.log(a);
-                            console.log('got me some artists');
+                            // console.log(a);
                             return a;
                         })
                 }));

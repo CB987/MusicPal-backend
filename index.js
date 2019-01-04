@@ -83,7 +83,7 @@ app.get('/myArtists', (req, res) => {
     Artist.getArtistsByUser(1)
         .then(artists => {
             res.send(artists);
-            console.log(artists);
+            console.log('got me some artists');
         });
 });
 
@@ -102,12 +102,34 @@ const Event = require('./models/Event');
 //GET EVENT BY LOCATION
 // Event.getByLocation('atlanta');
 
+//GET ALL EVENTS
+app.get('/eventList', (req, res) => {
+    Event.getFilteredShows("")
+        .then(results => {
+            res.send(results);
+            console.log('you get ALL the events')
+        })
+});
+
+// //SHOW EVENTS FOR SEARCH RESULTS
+// app.post('/eventList', (req, res) => {
+//     const searchTerm = req.body.searchTerm;
+
+//     Event.getFilteredShows(searchTerm)
+//         .then(results => {
+//             res.send(results);
+//             console.log('hows that for filtered')
+//         })
+// });
+
+
+
 //GET EVENTS LIST FOR USER
 app.get('/upcomingShows', (req, res) => {
     Event.getShowsForUser(1)
         .then(shows => {
             res.send(shows);
-            console.log(shows);
+            console.log('got your user shows right here');
         });
 });
 

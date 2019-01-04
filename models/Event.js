@@ -53,21 +53,42 @@ class Event {
         })
     }
 
+    static getFilteredShows(searchTerm) {
+        return db.any(`
+        SELECT a.name, e.venue, e.location, e.date
+        FROM events e
+        INNER JOIN artists a
+        ON e.artist_id = a.id
+        WHERE (a.name ILIKE '%$1:raw%' OR e.location ILIKE '%$1:raw%')
+        `, [searchTerm])
+            .then(eventObjArray => {
+                // console.log(eventObjArray)
+                return eventObjArray;
+                // let searchArray = eventObjArray.map(eventObj => {
+                //     let e = new Event(eventObj.id, eventObj.artist_id, eventObj.venue, eventObj.location, eventObj.date);
+                //     e.name = eventObj.name;
+
+                // })
+                // // console.log(e);
+                // return searchArray;
+            })
+    }
+
     static getShowsForUser(user_id) {
         return db.any(`
         SELECT * FROM user_shows
         WHERE user_id = $1
-        `, [user_id])
+            `, [user_id])
             .then(async (resultsArray) => {
                 // because 
 
                 let eventsArray = await Promise.all(resultsArray.map(async (eventObj) => {
                     return await db.one(`
-            SELECT a.name, e.venue, e.location, e.date
-            FROM events e
-            INNER JOIN artists a
-            ON e.artist_id = a.id
-            WHERE e.id = $1
+        SELECT a.name, e.venue, e.location, e.date
+        FROM events e
+        INNER JOIN artists a
+        ON e.artist_id = a.id
+        WHERE e.id = $1
             `, [eventObj.event_id])
                         .then(eventObj => {
                             console.log(eventObj);
