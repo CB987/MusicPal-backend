@@ -69,6 +69,27 @@ class User {
             })
     };
 
+    getFriendsOfUser() {
+        return db.any(`
+            SELECT * FROM user_friends
+            WHERE USER_ID = $1
+        `, [this.id])
+            .then(async (resultsArray) => {
+                let friendsArray = await Promise.all(resultsArray.map(async (userObj) => {
+                    return await db.one(`
+                        SELECT * FROM users
+                        WHERE id = $1
+                    `, [userObj.user_id])
+                        .then(userObj => {
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.email, userObj.city, userObj.state);
+                            console.log(u);
+                            return u;
+                        })
+                }));
+                return friendsArray;
+            })
+    };
+
     // static getUsersByGenre(genre) {
     //     return db.any(`
     //     SELECT * FROM users

@@ -29,6 +29,14 @@ app.get('/showUsers', (req, res) => {
         })
 })
 
+//GET FRIENDS BY USER
+app.get('/myFriends', (req, res) => {
+    User.getUserById(1)
+        .then(UserObj => {
+            UserObj.getFriendsOfUser
+        })
+})
+
 //UPDATE USER INFO
 // User.getUserById(id)
 //     .then(userObj => {
