@@ -18,7 +18,13 @@ const User = require('./models/User');
 // User.add('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA');
 
 //GET USER BY ID
-// User.getUserById(id);
+app.get('/myInfo', (req, res) => {
+    User.getUserById(1)
+        .then(user => {
+            res.send(user);
+            console.log('user info transmitted')
+        })
+})
 
 //GET USERS BY SHOW
 app.get('/showUsers', (req, res) => {

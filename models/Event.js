@@ -63,12 +63,17 @@ class Event {
 
                 let eventsArray = await Promise.all(resultsArray.map(async (eventObj) => {
                     return await db.one(`
-            SELECT * FROM events
-            WHERE id = $1
+            SELECT a.name, e.venue, e.location, e.date
+            FROM events e
+            INNER JOIN artists a
+            ON e.artist_id = a.id
+            WHERE e.id = $1
             `, [eventObj.event_id])
                         .then(eventObj => {
+                            console.log(eventObj);
                             let e = new Event(eventObj.id, eventObj.artist_id, eventObj.venue, eventObj.location, eventObj.date);
-                            // console.log(e);
+                            e.name = eventObj.name;
+                            console.log(e);
                             return e;
                         })
                 }));
