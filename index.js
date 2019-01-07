@@ -9,6 +9,19 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Session modules
+const session = require('express-session')
+const pgSession = require('connect-pg-simple')(session);
+
+app.use(session({
+    store: new pgSession({
+        pgPromise: db
+    }),
+    secret: 'abc123kasfsdbukbfrkqwuehnfioaebgfskdfhgcniw3y4fto7scdghlusdhbv',
+    saveUninitialized: false
+}));
+
+
 //============
 //USER METHODS
 //============
@@ -30,8 +43,8 @@ app.post('/register', (req, res) => {
     const newName = req.body.name;
 
     User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
-        .then((theUser) => {
-                console.log(theUser)
+        .then((newUser) => {
+                req.session.user = newUser;
                 res.redirect('/profile')
             });
         }
