@@ -17,6 +17,27 @@ const User = require('./models/User');
 //ADD USER
 // User.add('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA');
 
+// =====================
+// User registration
+// =====================
+
+app.post('/register', (req, res) => {
+    const newUsername= req.body.username;
+    const newPassword= req.body.password;
+    const newEmail = req.body.email;
+    const newCity = req.body.city;
+    const newState = req.body.state;
+    const newName = req.body.name;
+
+    User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
+        .then((theUser) => {
+                console.log(theUser)
+                res.redirect('/profile')
+            });
+        }
+)
+
+
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
     User.getUserById(1)

@@ -4,10 +4,11 @@ const db = require('./db');
 // const saltRounds = 10;
 
 class User {
-    constructor(id, name, username, email, city, state) {
+    constructor(id, name, username, password, email, city, state) {
         this.id = id;
         this.name = name;
         this.username = username;
+        this.password = password;
         this.email = email;
         this.city = city;
         this.state = state;
@@ -16,16 +17,16 @@ class User {
     //=======
     // CREATE
     //=======
-    static add(name, username, email, city, state) {
+    static add(name, username, password, email, city, state) {
         return db.one(`
         INSERT INTO users
-        (name, username, email, city, state)
+        (name, username, password, email, city, state)
         VALUES
-        ($1, $2, $3, $4, $5)
+        ($1, $2, $3, $4, $5, $6)
         returning id
-        `, [name, username, email, city, state])
+        `, [name, username, password, email, city, state])
             .then(data => {
-                const u = new User(data.id, name, username, email, city, state)
+                const u = new User(data.id, name, username, password, email, city, state)
                 return u;
             })
     };
