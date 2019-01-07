@@ -8,6 +8,10 @@ class APIEvent {
     }
 
 
+    static addAPIEvent(artist, venue, city, state, date) {
+        let api = new APIEvent(artist, venue, city, state, date)
+        return api;
+    }
 }
 
 module.exports = APIEvent;

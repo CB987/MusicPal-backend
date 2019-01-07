@@ -138,16 +138,21 @@ app.get('/upcomingShows', (req, res) => {
 //=============
 const APIEvent = require('./models/APIEvent');
 
-app.get('/apiEventList', (req, res) => {
+app.post('/apiEventList', (req, res) => {
+    console.log(req.body.searchTerm)
+})
+
+app.get('/APIEventList', (req, res) => {
+    console.log(req.body.searchTerm)
+    const keyword = '-tribute';
     const APIEvents = async () => {
         try {
-            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&keywords=concert+music&location=Atlanta+GA&date=This+Weekend&page_size=25`)
+            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25`)
         } catch (error) {
             console.error(error)
         }
     }
     const events = (APIEvents()
-        // .then(r => r.json())
         .then(data => {
             console.log(data);
             let eventArray = data.data.events.event.map(eventObj => {
@@ -164,25 +169,28 @@ app.get('/apiEventList', (req, res) => {
 
             })
             res.send(eventArray)
-            // const apiList = [
-            //                 {
-            //                     artist: data.events.event[0].title,
-            //                     venue: data.events.event[0].venue_name,
-            //                     city: data.events.event[0].city_name,
-            //                     state: data.events.event[0].region_abbr,
-            //                     date: data.events.event[0].start_time
-            //                 }
-            //             ];
-            //             return apiList
-
-
         }));
-    // .then(apiList => {
-    // res.send(events);
     console.log('api call nailed!');
-
-
 })
+
+app.post('/addShowToDb', (req, res) => {
+    APIEvent.addAPIEvent(
+        req.session.user, req.body.title, req.body.venue, req.body.city, req.body.state, req.body.date
+    ).then(info => {
+        Artist.add(info.req.body.title);
+        return Artist.id;
+        return info;
+    })
+        .then(info => {
+            Event.addEvent(Artist.id, info.req.body.venue, info.req.body.city, info.req.body.state, info.req.body.date);
+            return event.id;
+            return info;
+        }).then(info => {
+            User.getUserById(info.req.session.user).addUserGoingToShow(event.id);
+        })
+})
+
+
 
 
 
