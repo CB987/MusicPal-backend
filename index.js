@@ -11,6 +11,19 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Session modules
+const session = require('express-session')
+const pgSession = require('connect-pg-simple')(session);
+
+app.use(session({
+    store: new pgSession({
+        pgPromise: db
+    }),
+    secret: 'abc123kasfsdbukbfrkqwuehnfioaebgfskdfhgcniw3y4fto7scdghlusdhbv',
+    saveUninitialized: false
+}));
+
+
 //============
 //USER METHODS
 //============
@@ -19,10 +32,54 @@ const User = require('./models/User');
 //ADD USER
 // User.add('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA');
 
+// =====================
+// User registration
+// =====================
+
+app.post('/register', (req, res) => {
+    const newUsername= req.body.username;
+    const newPassword= req.body.password;
+    const newEmail = req.body.email;
+    const newCity = req.body.city;
+    const newState = req.body.state;
+    const newName = req.body.name;
+
+    User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
+        .then((newUser) => {
+                req.session.user = newUser;
+                res.redirect('/profile')
+            });
+        }
+)
+
+// =====================
+// User Login
+// =====================
+app.post('/login', (req, res) => {
+    const theUsername = req.body.username;
+    const thePassword = req.body.password;
+    User.getByUsername(theUsername)
+        .catch((err) => {
+            console.log(err);
+            res.redirect('/login')
+        })
+        .then(theUser => {
+            if (theUser.passwordDoesMatch(thePassword)) {
+                console.log(`you're in`)
+                res.redirect('/profile');
+            } else {
+                console.log(`you're out`)
+                res.redirect('/login');
+            }
+                
+        })
+})
+
+
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
     User.getUserById(1)
-        .then(user => {
+        .catch(user => {
             res.send(user);
             console.log('sending user info like a muthafucka')
         })
