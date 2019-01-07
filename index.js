@@ -46,7 +46,7 @@ app.post('/login', (req, res) => {
     User.getByUsername(theUsername)
         .catch((err) => {
             console.log(err);
-            res.send(`that's not a registered username`)
+            res.redirect('/login')
         })
         .then(theUser => {
             if (theUser.passwordDoesMatch(thePassword)) {
