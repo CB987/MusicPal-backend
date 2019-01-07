@@ -33,7 +33,7 @@ app.get('/showUsers', (req, res) => {
     User.getUsersGoingToShow(1)
         .then(shows => {
             res.send(shows);
-            console.log(shows);
+            console.log('shows. BAM');
         })
 })
 
@@ -42,7 +42,7 @@ app.get('/myFriends', (req, res) => {
     User.getFriendsOfUser(1)
         .then(friends => {
             res.send(friends);
-            console.log(friends);
+            console.log('friends are the glue that sticks concerts together');
         });
 });
 
@@ -124,26 +124,6 @@ app.get('/eventList', (req, res) => {
 //         })
 // });
 
-//EVENTS FROM API
-app.get('/apiEventList', (req, res) => {
-    const APIEvents = async () => {
-        try {
-            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&=concert+music&location=Atlanta+GA&date=This+Weekend`)
-        } catch (error) {
-            console.error(error)
-        }
-    }
-    const events = (APIEvents()
-        // .then(r => r.json())
-
-        .then((data => {
-            res.send(data.data.events.event[0].title);
-            console.log('api call nailed!');
-        }))
-
-    );
-});
-
 //GET EVENTS LIST FOR USER
 app.get('/upcomingShows', (req, res) => {
     Event.getShowsForUser(1)
@@ -152,6 +132,60 @@ app.get('/upcomingShows', (req, res) => {
             console.log('got your user shows right here');
         });
 });
+
+//=============
+//EVENTS FROM API
+//=============
+const APIEvent = require('./models/APIEvent');
+
+app.get('/apiEventList', (req, res) => {
+    const APIEvents = async () => {
+        try {
+            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&keywords=concert+music&location=Atlanta+GA&date=This+Weekend&page_size=25`)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    const events = (APIEvents()
+        // .then(r => r.json())
+        .then(data => {
+            console.log(data);
+            let eventArray = data.data.events.event.map(eventObj => {
+
+
+                let a = new APIEvent(
+
+                    eventObj.title,
+                    eventObj.venue_name,
+                    eventObj.city_name,
+                    eventObj.region_abbr,
+                    eventObj.start_time)
+                return a;
+
+            })
+            res.send(eventArray)
+            // const apiList = [
+            //                 {
+            //                     artist: data.events.event[0].title,
+            //                     venue: data.events.event[0].venue_name,
+            //                     city: data.events.event[0].city_name,
+            //                     state: data.events.event[0].region_abbr,
+            //                     date: data.events.event[0].start_time
+            //                 }
+            //             ];
+            //             return apiList
+
+
+        }));
+    // .then(apiList => {
+    // res.send(events);
+    console.log('api call nailed!');
+
+
+})
+
+
+
 
 
 app.listen(5000, () => {
