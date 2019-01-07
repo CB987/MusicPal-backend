@@ -50,6 +50,21 @@ class User {
             })
     }
 
+    static getByUsername(username) {
+        return db.one(`
+        SELECT * from users
+            WHERE username = $1
+            `, [username])
+                .then(result => {
+                    return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.city, result.state )
+                })
+    }
+
+    passwordDoesMatch(thePassword) {
+        const didMatch = bcrypt.compareSync(thePassword, this.pwhash);
+        return didMatch
+    }
+
     static getUsersGoingToShow(event_id) {
         return db.any(`
         SELECT * FROM user_shows

@@ -37,11 +37,34 @@ app.post('/register', (req, res) => {
         }
 )
 
+// =====================
+// User Login
+// =====================
+app.post('/login', (req, res) => {
+    const theUsername = req.body.username;
+    const thePassword = req.body.password;
+    User.getByUsername(theUsername)
+        .catch((err) => {
+            console.log(err);
+            res.send(`that's not a registered username`)
+        })
+        .then(theUser => {
+            if (theUser.passwordDoesMatch(thePassword)) {
+                console.log(`you're in`)
+                res.redirect('/profile');
+            } else {
+                console.log(`you're out`)
+                res.redirect('/login');
+            }
+                
+        })
+})
+
 
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
     User.getUserById(1)
-        .then(user => {
+        .catch(user => {
             res.send(user);
             console.log('user info transmitted')
         })
