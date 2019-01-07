@@ -2,7 +2,7 @@ create table users (
     id serial primary key,
     name varchar(50),
     username varchar(20),
-    password varchar(100),
+    pwhash varchar(100),
     email varchar(50),
     city text,
     state varchar(2)

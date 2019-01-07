@@ -1,14 +1,17 @@
 const db = require('./db');
 
+const bcrypt= require('bcrypt');
+const saltRounds = 10;
+
 // const bcrypt = require('bcrypt');
 // const saltRounds = 10;
 
 class User {
-    constructor(id, name, username, password, email, city, state) {
+    constructor(id, name, username, pwhash, email, city, state) {
         this.id = id;
         this.name = name;
         this.username = username;
-        this.password = password;
+        this.pwhash = pwhash;
         this.email = email;
         this.city = city;
         this.state = state;
@@ -18,15 +21,17 @@ class User {
     // CREATE
     //=======
     static add(name, username, password, email, city, state) {
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
         return db.one(`
         INSERT INTO users
-        (name, username, password, email, city, state)
+        (name, username, pwhash, email, city, state)
         VALUES
         ($1, $2, $3, $4, $5, $6)
         returning id
-        `, [name, username, password, email, city, state])
+        `, [name, username, hash, email, city, state])
             .then(data => {
-                const u = new User(data.id, name, username, password, email, city, state)
+                const u = new User(data.id, name, username, hash, email, city, state)
                 return u;
             })
     };
