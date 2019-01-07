@@ -9,15 +9,35 @@ class Event {
         this.date = date;
     }
 
-    // *********************
-    // CRUD - RETRIEVE only
-    // *********************
+    //**********
+    // CREATE */
+    //********** 
+
+    static addEvent(artist_id, venue, location, date) {
+        return db.one(`
+            INSERT INTO events
+            (artist_id, venue, location, date)
+            VALUES
+            ($1, $2, $3, $4)
+            returning id
+            `, [artist_id, venue, location, date])
+            .then(data => {
+                const e = new Event(data.id, artist_id, venue, location, date)
+                return e;
+            })
+    }
+
+    // static addEventFromAPI
+
+    // ********
+    // RETRIEVE
+    // ********
 
     static getEventById(id) {
         return db.one(`
         SELECT * from events
-            WHERE id = $1
-        `, [id])
+        WHERE id = $1
+            `, [id])
             .then(result => {
                 const e = new Event(result.id, result.artist_id, result.venue, result.location, result.date)
                 console.log(e)
@@ -27,9 +47,9 @@ class Event {
 
     static getByArtist(artist) {
         return db.any(`
-            select * from events
-                where artist ILIKE '%$1:raw%'
-        `, [artist]).then(resultsArray => {
+        select * from events
+        where artist ILIKE '%$1:raw%'
+            `, [artist]).then(resultsArray => {
             let artistItems = resultsArray.map(itemObj => {
                 let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
                 return e;
@@ -41,9 +61,9 @@ class Event {
 
     static getByLocation(location) {
         return db.any(`
-            select * from events
-                where location ILIKE '%$1:raw%'
-        `, [location]).then(resultsArray => {
+        select * from events
+        where location ILIKE '%$1:raw%'
+            `, [location]).then(resultsArray => {
             let locationItems = resultsArray.map(itemObj => {
                 let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
                 return e;
@@ -59,8 +79,8 @@ class Event {
         FROM events e
         INNER JOIN artists a
         ON e.artist_id = a.id
-        WHERE (a.name ILIKE '%$1:raw%' OR e.location ILIKE '%$1:raw%')
-        `, [searchTerm])
+        WHERE(a.name ILIKE '%$1:raw%' OR e.location ILIKE '%$1:raw%')
+            `, [searchTerm])
             .then(eventObjArray => {
                 // console.log(eventObjArray)
                 return eventObjArray;

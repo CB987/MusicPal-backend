@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const db = require('./models/db');
+const axios = require('axios');
+const API_KEY = process.env.EVENTFUL_API_KEY;
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +24,7 @@ app.get('/myInfo', (req, res) => {
     User.getUserById(1)
         .then(user => {
             res.send(user);
-            console.log('user info transmitted')
+            console.log('sending user info like a muthafucka')
         })
 })
 
@@ -122,7 +124,25 @@ app.get('/eventList', (req, res) => {
 //         })
 // });
 
+//EVENTS FROM API
+app.get('/apiEventList', (req, res) => {
+    const APIEvents = async () => {
+        try {
+            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&=concert+music&location=Atlanta+GA&date=This+Weekend`)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    const events = (APIEvents()
+        // .then(r => r.json())
 
+        .then((data => {
+            res.send(data.data.events.event[0].title);
+            console.log('api call nailed!');
+        }))
+
+    );
+});
 
 //GET EVENTS LIST FOR USER
 app.get('/upcomingShows', (req, res) => {
