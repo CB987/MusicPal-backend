@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const db = require('./models/db');
+const axios = require('axios');
+const API_KEY = process.env.EVENTFUL_API_KEY;
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +24,7 @@ app.get('/myInfo', (req, res) => {
     User.getUserById(1)
         .then(user => {
             res.send(user);
-            console.log('user info transmitted')
+            console.log('sending user info like a muthafucka')
         })
 })
 
@@ -31,7 +33,7 @@ app.get('/showUsers', (req, res) => {
     User.getUsersGoingToShow(1)
         .then(shows => {
             res.send(shows);
-            console.log(shows);
+            console.log('shows. BAM');
         })
 })
 
@@ -40,7 +42,7 @@ app.get('/myFriends', (req, res) => {
     User.getFriendsOfUser(1)
         .then(friends => {
             res.send(friends);
-            console.log(friends);
+            console.log('friends are the glue that sticks concerts together');
         });
 });
 
@@ -122,8 +124,6 @@ app.get('/eventList', (req, res) => {
 //         })
 // });
 
-
-
 //GET EVENTS LIST FOR USER
 app.get('/upcomingShows', (req, res) => {
     Event.getShowsForUser(1)
@@ -132,6 +132,68 @@ app.get('/upcomingShows', (req, res) => {
             console.log('got your user shows right here');
         });
 });
+
+//=============
+//EVENTS FROM API
+//=============
+const APIEvent = require('./models/APIEvent');
+
+app.post('/apiEventList', (req, res) => {
+    console.log(req.body.searchTerm)
+})
+
+app.get('/APIEventList', (req, res) => {
+    console.log(req.body.searchTerm)
+    const keyword = '-tribute';
+    const APIEvents = async () => {
+        try {
+            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25`)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    const events = (APIEvents()
+        .then(data => {
+            console.log(data);
+            let eventArray = data.data.events.event.map(eventObj => {
+
+
+                let a = new APIEvent(
+
+                    eventObj.title,
+                    eventObj.venue_name,
+                    eventObj.city_name,
+                    eventObj.region_abbr,
+                    eventObj.start_time)
+                return a;
+
+            })
+            res.send(eventArray)
+        }));
+    console.log('api call nailed!');
+})
+
+app.post('/addShowToDb', (req, res) => {
+    APIEvent.addAPIEvent(
+        req.session.user, req.body.title, req.body.venue, req.body.city, req.body.state, req.body.date
+    ).then(info => {
+        Artist.add(info.req.body.title);
+        return Artist.id;
+        return info;
+    })
+        .then(info => {
+            Event.addEvent(Artist.id, info.req.body.venue, info.req.body.city, info.req.body.state, info.req.body.date);
+            return event.id;
+            return info;
+        }).then(info => {
+            User.getUserById(info.req.session.user).addUserGoingToShow(event.id);
+        })
+})
+
+
+
+
+
 
 
 app.listen(5000, () => {
