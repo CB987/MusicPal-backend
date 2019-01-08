@@ -23,6 +23,26 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// =========================
+// Protecting User Account
+// =========================
+function protectRoute(req, res, next) {
+    let isLoggedIn = req.session.user ? true : false;
+    
+    if (isLoggedIn) {
+        console.log(`${req.session.user} is logged in`);
+        next();
+    } else {
+        console.log('not logged in');
+        res.redirect('/login')
+    }
+}
+
+app.use((req, res, next) => {
+    let isLoggedIn = req.session.user ? true : false;
+    console.log(`on ${req.path}, is a user logged in? ${isLoggedIn}`);
+    next();
+});
 
 //============
 //USER METHODS
@@ -46,10 +66,15 @@ app.post('/register', (req, res) => {
 
     User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
         .then((newUser) => {
-            req.session.user = newUser;
-            res.redirect('/profile')
-        });
-}
+
+                req.session.user = newUser;
+                req.session.save(() => {
+                    res.redirect('/profile')
+                })
+
+            });
+        }
+
 )
 
 // =====================
@@ -65,8 +90,13 @@ app.post('/login', (req, res) => {
         })
         .then(theUser => {
             if (theUser.passwordDoesMatch(thePassword)) {
+                req.session.user = theUser
                 console.log(`you're in`)
-                res.redirect('/profile');
+                console.log(`${req.session.user.username}`)
+                req.session.save(() => {
+                    res.redirect('/profile');
+                })
+
             } else {
                 console.log(`you're out`)
                 res.redirect('/login');
@@ -75,6 +105,16 @@ app.post('/login', (req, res) => {
         })
 })
 
+// =====================
+// User Profile
+// =====================
+app.get('/profile', protectRoute, (req, res) => {
+    const username = req.session.user.username
+    const userCity = req.session.user.state
+    const userInfo = {username, userCity}
+    // let isLoggedIn = req.session.user ? true : false;
+    res.send(userInfo)
+})
 
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
@@ -283,7 +323,18 @@ app.post('/addShowToDb', (req, res) => {
 })
 
 
+// ==================================================
+// Logout
+// ====================================================
 
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        // console.log('you have logged out')
+        res.redirect('/login')
+    })
+    
+    
+});
 
 
 
