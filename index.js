@@ -87,8 +87,6 @@ app.post('/login', (req, res) => {
 // User Profile
 // =====================
 app.get('/profile', (req, res) => {
-    console.log(`the user is ${req.session.user.username}`)
-    console.log(`the user's city is ${req.session.user.city}`)
     const username = req.session.user.username
     const userCity = req.session.user.state
     const userInfo = {username, userCity}
@@ -267,7 +265,18 @@ app.post('/addShowToDb', (req, res) => {
 })
 
 
+// ==================================================
+// Logout
+// ====================================================
 
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        console.log('you have logged out')
+        res.redirect('/login')
+    })
+    
+    
+});
 
 
 
