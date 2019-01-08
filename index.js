@@ -57,8 +57,8 @@ const User = require('./models/User');
 // =====================
 
 app.post('/register', (req, res) => {
-    const newUsername= req.body.username;
-    const newPassword= req.body.password;
+    const newUsername = req.body.username;
+    const newPassword = req.body.password;
     const newEmail = req.body.email;
     const newCity = req.body.city;
     const newState = req.body.state;
@@ -66,6 +66,7 @@ app.post('/register', (req, res) => {
 
     User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
         .then((newUser) => {
+
                 req.session.user = newUser;
                 req.session.save(() => {
                     res.redirect('/profile')
@@ -73,6 +74,7 @@ app.post('/register', (req, res) => {
 
             });
         }
+
 )
 
 // =====================
@@ -99,7 +101,7 @@ app.post('/login', (req, res) => {
                 console.log(`you're out`)
                 res.redirect('/login');
             }
-                
+
         })
 })
 
@@ -233,38 +235,73 @@ app.get('/upcomingShows', (req, res) => {
 //=============
 const APIEvent = require('./models/APIEvent');
 
-app.post('/apiEventList', (req, res) => {
-    console.log(req.body.searchTerm)
-})
+let keyword;
 
-app.get('/APIEventList', (req, res) => {
-    console.log(req.body.searchTerm)
-    const keyword = '-tribute';
+app.post('/APIeventList', (req, res) => {
+    console.log(req.body.searchTerm);
+    let keyword = req.body.searchTerm;
+    // })
+
+    // app.get('/APIEventList', (req, res) => {
+    //     console.log(req.body.searchTerm)
+    // keyword = req.body.searchTerm;
     const APIEvents = async () => {
         try {
-            return await axios.get(`http://api.eventful.com/json/events/search?app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25`)
-        } catch (error) {
+            return await axios.get(`http://api.eventful.com/json/events/search?`, {
+                // app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25
+                params: {
+                    app_key: `${API_KEY}`,
+                    keywords: `concert music ${keyword}`,
+                    location: `Atlanta GA`,
+                    date: `future`,
+                    page_size: 25,
+                    sort_order: `date`
+                }
+            })
+        }
+
+        catch (error) {
             console.error(error)
         }
     }
     const events = (APIEvents()
         .then(data => {
             console.log(data);
-            let eventArray = data.data.events.event.map(eventObj => {
+            console.log('^^ data ends');
+            let eventArray;
 
+            if (data.data.total_items = 0) {
+                console.log('this is the if');
+                // eventArray = [{ artist: null }];
+                // return eventArray;
+            }
+            else {
+                console.log('this is the else');
+                eventArray = data.data.events.event.map(eventObj => {
 
-                let a = new APIEvent(
+                    let a = new APIEvent(
 
-                    eventObj.title,
-                    eventObj.venue_name,
-                    eventObj.city_name,
-                    eventObj.region_abbr,
-                    eventObj.start_time)
-                return a;
+                        eventObj.title,
+                        eventObj.venue_name,
+                        eventObj.city_name,
+                        eventObj.region_abbr,
+                        eventObj.start_time)
+                    console.log(a);
+                    return a;
+                })
+            }
 
-            })
-            res.send(eventArray)
-        }));
+            return eventArray
+            // res.send(eventArray)
+            // }
+        })
+
+        .then(eventArray => {
+            res.send(eventArray);
+        })
+        .catch(error => {
+            console.error(error)
+        }))
     console.log('api call nailed!');
 })
 
