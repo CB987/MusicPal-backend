@@ -28,7 +28,7 @@ app.use(session({
 // =========================
 function protectRoute(req, res, next) {
     let isLoggedIn = req.session.user ? true : false;
-    
+
     if (isLoggedIn) {
         console.log(`${req.session.user} is logged in`);
         next();
@@ -67,13 +67,13 @@ app.post('/register', (req, res) => {
     User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
         .then((newUser) => {
 
-                req.session.user = newUser;
-                req.session.save(() => {
-                    res.redirect('/profile')
-                })
+            req.session.user = newUser;
+            req.session.save(() => {
+                res.redirect('/profile')
+            })
 
-            });
-        }
+        });
+}
 
 )
 
@@ -111,7 +111,7 @@ app.post('/login', (req, res) => {
 app.get('/profile', protectRoute, (req, res) => {
     const username = req.session.user.username
     const userCity = req.session.user.state
-    const userInfo = {username, userCity}
+    const userInfo = { username, userCity }
     // let isLoggedIn = req.session.user ? true : false;
     res.send(userInfo)
 })
@@ -315,17 +315,28 @@ app.post('/addShowToDb', (req, res) => {
     APIEvent.addAPIEvent(
         req.session.user, req.body.title, req.body.venue, req.body.city, req.body.state, req.body.date
     ).then(info => {
-        Artist.add(info.req.body.title);
-        return Artist.id;
-        return info;
+        Artist.add(req.body.title)
+            .then(artist => {
+                info.artist_id = artist.id
+                return info
+            })
+            .then(info => {
+                Event.addEvent(info.artist_id, req.body.venue, req.body.city, req.body.state, req.body.date)
+                    .then(event => {
+                        info.event_id = event.id
+                        return info
+                    })
+                    .then(info => {
+                        User.getUserById(req.session.user)
+                            .then(user => {
+                                user.addUserGoingToShow(info.event_id)
+                                    .then(() => {
+                                        res.send('you did it!')
+                                    })
+                            })
+                    })
+            })
     })
-        .then(info => {
-            Event.addEvent(Artist.id, info.req.body.venue, info.req.body.city, info.req.body.state, info.req.body.date);
-            return event.id;
-            return info;
-        }).then(info => {
-            User.getUserById(info.req.session.user).addUserGoingToShow(event.id);
-        })
 })
 
 
@@ -338,8 +349,8 @@ app.post('/logout', (req, res) => {
         // console.log('you have logged out')
         res.redirect('/login')
     })
-    
-    
+
+
 });
 
 
