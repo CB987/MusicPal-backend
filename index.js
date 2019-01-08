@@ -195,11 +195,17 @@ app.get('/upcomingShows', (req, res) => {
 //=============
 const APIEvent = require('./models/APIEvent');
 
-let keyword;
+// let location;
+// let keyword;
 
 app.post('/APIeventList', (req, res) => {
-    console.log(req.body.searchTerm);
-    let keyword = req.body.searchTerm;
+    console.log(req.body.searchLocation);
+    let location = req.body.searchLocation;
+    let keyword = req.body.searchKeyword;
+    console.log(req.body.searchKeyword);
+    let artist = req.body.searchArtist;
+    console.log(req.body.searchArtist);
+
     // })
 
     // app.get('/APIEventList', (req, res) => {
@@ -211,8 +217,8 @@ app.post('/APIeventList', (req, res) => {
                 // app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25
                 params: {
                     app_key: `${API_KEY}`,
-                    keywords: `concert music ${keyword}`,
-                    location: `Atlanta GA`,
+                    keywords: `concert music ${artist} ${keyword}`,
+                    location: `${location}`,
                     date: `future`,
                     page_size: 25,
                     sort_order: `date`
@@ -226,13 +232,13 @@ app.post('/APIeventList', (req, res) => {
     }
     const events = (APIEvents()
         .then(data => {
-            console.log(data);
+            console.log(data.data.total_items);
             console.log('^^ data ends');
             let eventArray;
 
-            if (data.data.total_items = 0) {
+            if (data.data.total_items === '0') {
                 console.log('this is the if');
-                // eventArray = [{ artist: null }];
+                eventArray = [{ artist: null }];
                 // return eventArray;
             }
             else {
