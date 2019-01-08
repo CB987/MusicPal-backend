@@ -68,8 +68,13 @@ app.post('/login', (req, res) => {
         })
         .then(theUser => {
             if (theUser.passwordDoesMatch(thePassword)) {
+                req.session.user = theUser
                 console.log(`you're in`)
-                res.redirect('/profile');
+                console.log(`${req.session.user.username}`)
+                req.session.save(() => {
+                    res.redirect('/profile');
+                })
+
             } else {
                 console.log(`you're out`)
                 res.redirect('/login');
@@ -82,8 +87,9 @@ app.post('/login', (req, res) => {
 // User Profile
 // =====================
 app.get('/profile', (req, res) => {
-    console.log(req.session.user.username)
-    res.send(`<h2>Hey${req.session.user.username}></h2>`)
+    console.log(`the user is ${req.session.user.username}`)
+    const username = req.session.user.username
+    res.send(username)
 })
 
 //GET USER BY ID
