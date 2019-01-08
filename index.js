@@ -47,7 +47,10 @@ app.post('/register', (req, res) => {
     User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
         .then((newUser) => {
                 req.session.user = newUser;
-                res.redirect('/profile')
+                req.session.save(() => {
+                    res.redirect('/profile')
+                })
+
             });
         }
 )
@@ -75,6 +78,13 @@ app.post('/login', (req, res) => {
         })
 })
 
+// =====================
+// User Profile
+// =====================
+app.get('/profile', (req, res) => {
+    console.log(req.session.user.username)
+    res.send(`<h2>Hey${req.session.user.username}></h2>`)
+})
 
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
