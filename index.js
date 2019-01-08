@@ -23,6 +23,26 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// =========================
+// Protecting User Account
+// =========================
+function protectRoute(req, res, next) {
+    let isLoggedIn = req.session.user ? true : false;
+    
+    if (isLoggedIn) {
+        console.log(`${req.session.user} is logged in`);
+        next();
+    } else {
+        console.log('not logged in');
+        res.redirect('/login')
+    }
+}
+
+app.use((req, res, next) => {
+    let isLoggedIn = req.session.user ? true : false;
+    console.log(`on ${req.path}, is a user logged in? ${isLoggedIn}`);
+    next();
+});
 
 //============
 //USER METHODS
@@ -86,10 +106,11 @@ app.post('/login', (req, res) => {
 // =====================
 // User Profile
 // =====================
-app.get('/profile', (req, res) => {
+app.get('/profile', protectRoute, (req, res) => {
     const username = req.session.user.username
     const userCity = req.session.user.state
     const userInfo = {username, userCity}
+    // let isLoggedIn = req.session.user ? true : false;
     res.send(userInfo)
 })
 
@@ -271,7 +292,7 @@ app.post('/addShowToDb', (req, res) => {
 
 app.post('/logout', (req, res) => {
     req.session.destroy(() => {
-        console.log('you have logged out')
+        // console.log('you have logged out')
         res.redirect('/login')
     })
     
