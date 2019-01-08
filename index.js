@@ -88,8 +88,11 @@ app.post('/login', (req, res) => {
 // =====================
 app.get('/profile', (req, res) => {
     console.log(`the user is ${req.session.user.username}`)
+    console.log(`the user's city is ${req.session.user.city}`)
     const username = req.session.user.username
-    res.send(username)
+    const userCity = req.session.user.state
+    const userInfo = {username, userCity}
+    res.send(userInfo)
 })
 
 //GET USER BY ID
