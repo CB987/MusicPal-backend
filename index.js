@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const db = require('./models/db');
 const axios = require('axios');
 const API_KEY = process.env.EVENTFUL_API_KEY;
+const lastfm_key = process.env.LASTFM_API_KEY;
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -185,7 +186,57 @@ app.get('/myArtists', (req, res) => {
             console.log('got me some artists');
         });
 });
+//===================
+// Artists from API
+//====================
+app.get('/APIartistList', (req, res) => {
+    console.log(req.body.artistSearch)
+    // let artistSearch = req.body.artistSearch;
 
+
+    const APIArtists = async () => {
+        try {
+            return await axios.get(`http://ws.audioscrobbler.com/2.0/?`, {
+                params: {
+                    method: `artist.search`,
+                    artist: `drake`,
+                    api_key: `${lastfm_key}`,
+                    format: `json`
+                }
+            })
+        }
+
+        catch (error) {
+            console.error(error)
+        }
+    }
+
+    const artists = (APIArtists()
+        .then(data => {
+            const artistResults= data.data.results.artistmatches
+            // console.log(data.data.results)
+            artistArray = artistResults.artist.map(artistObj => {
+                let a = new Artist(
+                    artistObj.name
+                    
+                )
+                console.log(a)
+                return a; 
+
+            })
+            // res.send(artistResults)
+            console.log('api artists received')
+            return artistArray
+            // return artistArray
+
+        }))
+        .then(artistArray => {
+            res.send(artistArray)
+        })
+        .catch(error => {
+            console.error(error)
+        })
+})
 
 //=============
 //EVENT METHODS
