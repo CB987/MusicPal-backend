@@ -286,7 +286,7 @@ app.post('/APIeventList', (req, res) => {
                 eventArray = data.data.events.event.map(eventObj => {
 
                     let a = new APIEvent(
-
+                        eventObj.id,
                         eventObj.title,
                         eventObj.venue_name,
                         eventObj.city_name,
