@@ -1,6 +1,6 @@
 const db = require('./db');
 
-const bcrypt= require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 // const bcrypt = require('bcrypt');
@@ -58,7 +58,7 @@ class User {
         WHERE id = $1
         `, [id])
             .then(result => {
-                const u = new User(result.id, result.name, result.username, result.email, result.city, result.state);
+                const u = new User(result.id, result.name, result.username, result.pwhash, result.email, result.city, result.state);
                 return u;
             })
     }
@@ -68,9 +68,9 @@ class User {
         SELECT * from users
             WHERE username = $1
             `, [username])
-                .then(result => {
-                    return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.city, result.state )
-                })
+            .then(result => {
+                return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.city, result.state)
+            })
     }
 
     passwordDoesMatch(thePassword) {
@@ -92,7 +92,7 @@ class User {
             WHERE id = $1
             `, [userObj.user_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.email, userObj.city, userObj.state);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.city, userObj.state);
                             console.log(u);
                             return u;
                         })
@@ -115,7 +115,7 @@ class User {
                         WHERE id = $1
                     `, [userObj.friend_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.email, userObj.city, userObj.state);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.city, userObj.state);
                             // console.log(u);
                             return u;
                         })
@@ -134,12 +134,12 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo(name, username, email, city, state) {
+    updateUserInfo(name, username, pwhash, email, city, state) {
         return db.result(`
         UPDATE users
             SET name = $2, username = $3, email = $4, city = $5, state = $6
             WHERE id= $1;
-        `, [this.id, name, username, email, city, state])
+        `, [this.id, name, username, pwhash, email, city, state])
             .then(result => {
                 console.log(result)
             })

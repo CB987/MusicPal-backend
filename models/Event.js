@@ -1,11 +1,12 @@
 const db = require('./db');
 
 class Event {
-    constructor(id, artist_id, venue, location, date) {
+    constructor(id, artist_id, venue, city, state, date) {
         this.id = id;
         this.artist_id = artist_id;
         this.venue = venue;
-        this.location = location;
+        this.city = city;
+        this.state = state;
         this.date = date;
     }
 
@@ -13,16 +14,16 @@ class Event {
     // CREATE */
     //********** 
 
-    static addEvent(artist_id, venue, location, date) {
+    static addEvent(artist_id, venue, city, state, date) {
         return db.one(`
             INSERT INTO events
-            (artist_id, venue, location, date)
+            (artist_id, venue, city, state, date)
             VALUES
             ($1, $2, $3, $4)
             returning id
-            `, [artist_id, venue, location, date])
+            `, [artist_id, venue, city, state, date])
             .then(data => {
-                const e = new Event(data.id, artist_id, venue, location, date)
+                const e = new Event(data.id, artist_id, venue, city, state, date)
                 return e;
             })
     }
@@ -39,7 +40,7 @@ class Event {
         WHERE id = $1
             `, [id])
             .then(result => {
-                const e = new Event(result.id, result.artist_id, result.venue, result.location, result.date)
+                const e = new Event(result.id, result.artist_id, result.venue, result.city, result.state, result.date)
                 console.log(e)
                 return e;
             })
@@ -51,7 +52,7 @@ class Event {
         where artist ILIKE '%$1:raw%'
             `, [artist]).then(resultsArray => {
             let artistItems = resultsArray.map(itemObj => {
-                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
+                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.city, itemObj.state, itemObj.date);
                 return e;
             });
             console.log(artistItems)
@@ -65,7 +66,7 @@ class Event {
         where location ILIKE '%$1:raw%'
             `, [location]).then(resultsArray => {
             let locationItems = resultsArray.map(itemObj => {
-                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.location, itemObj.date);
+                let e = new Event(itemObj.id, itemObj.artist_id, itemObj.venue, itemObj.city, itemObj.state, itemObj.date);
                 return e;
             });
             console.log(locationItems)
@@ -75,11 +76,11 @@ class Event {
 
     static getFilteredShows(searchTerm) {
         return db.any(`
-        SELECT a.name, e.venue, e.location, e.date
+        SELECT a.name, e.venue, e.city, e.state, e.date
         FROM events e
         INNER JOIN artists a
         ON e.artist_id = a.id
-        WHERE(a.name ILIKE '%$1:raw%' OR e.location ILIKE '%$1:raw%')
+        WHERE(a.name ILIKE '%$1:raw%' OR e.city ILIKE '%$1:raw%')
             `, [searchTerm])
             .then(eventObjArray => {
                 // console.log(eventObjArray)
@@ -104,7 +105,7 @@ class Event {
 
                 let eventsArray = await Promise.all(resultsArray.map(async (eventObj) => {
                     return await db.one(`
-        SELECT a.name, e.venue, e.location, e.date
+        SELECT a.name, e.venue, e.city, e.state, e.date
         FROM events e
         INNER JOIN artists a
         ON e.artist_id = a.id
@@ -112,7 +113,7 @@ class Event {
             `, [eventObj.event_id])
                         .then(eventObj => {
                             console.log(eventObj);
-                            let e = new Event(eventObj.id, eventObj.artist_id, eventObj.venue, eventObj.location, eventObj.date);
+                            let e = new Event(eventObj.id, eventObj.artist_id, eventObj.venue, eventObj.city, eventObj.state, eventObj.date);
                             e.name = eventObj.name;
                             console.log(e);
                             return e;
