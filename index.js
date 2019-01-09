@@ -312,10 +312,12 @@ app.post('/APIeventList', (req, res) => {
 })
 
 app.post('/addShowToDb', (req, res) => {
+    console.log(req.body.artist);
+
     APIEvent.addAPIEvent(
-        req.session.user, req.body.title, req.body.venue, req.body.city, req.body.state, req.body.date
+        req.session.user, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date
     ).then(info => {
-        Artist.add(req.body.title)
+        Artist.add(req.body.artist)
             .then(artist => {
                 info.artist_id = artist.id
                 return info
