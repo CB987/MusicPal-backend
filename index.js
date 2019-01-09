@@ -126,8 +126,10 @@ app.get('/myInfo', (req, res) => {
 })
 
 //GET USERS BY SHOW
-app.get('/showUsers', (req, res) => {
-    User.getUsersGoingToShow(1)
+app.post('/showUsers', (req, res) => {
+    console.log(req.body.eventID)
+    let eventID = req.body.eventID;
+    User.getUsersGoingToShow(eventID)
         .then(shows => {
             res.send(shows);
             console.log('shows. BAM');
@@ -286,7 +288,7 @@ app.post('/APIeventList', (req, res) => {
                 eventArray = data.data.events.event.map(eventObj => {
 
                     let a = new APIEvent(
-
+                        eventObj.id,
                         eventObj.title,
                         eventObj.venue_name,
                         eventObj.city_name,
@@ -312,10 +314,13 @@ app.post('/APIeventList', (req, res) => {
 })
 
 app.post('/addShowToDb', (req, res) => {
+    console.log(req.body.artist);
+    console.log(req.session.user)
+
     APIEvent.addAPIEvent(
-        req.session.user, req.body.title, req.body.venue, req.body.city, req.body.state, req.body.date
+        req.session.user, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date
     ).then(info => {
-        Artist.add(req.body.title)
+        Artist.add(req.body.artist)
             .then(artist => {
                 info.artist_id = artist.id
                 return info

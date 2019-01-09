@@ -14,17 +14,18 @@ create table artists (
 );
 
 create table events (
-    id serial primary key,
+    id varchar(18) primary key,
     artist_id integer references artists (id),
     venue text,
-    location text,
+    city text,
+    state text,
     date DATE
 );
 
 create table user_shows (
     id serial primary key,
     user_id integer references users (id),
-    event_id integer references events (id)
+    event_id varchar references events (id)
 );
 
 create table user_friends (
