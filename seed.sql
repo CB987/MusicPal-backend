@@ -1,13 +1,14 @@
 insert into users (
     name,
     username,
+    pwhash,
     email,
     city,
     state
 ) values
-('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA'),
-('Jamie', 'Jamie', 'jamie@jamie.com', 'Mableton', 'GA'),
-('Clare', 'Clare', 'clare@clare.com', 'Mableton', 'GA');
+('Amelia', 'amelia', '$2b$10$4a3j3GgFfAPXQAn3aDsst.XuVs58ozNsYfRM3a/LAbCz3HUzpCGoS', 'amelia@amelia.com', 'Decatur', 'GA'),
+('Jamie',	'jamie',	'$2b$10$hcNfrqNcgDhGCkWb3ZvTJe88umWV5GS7/asFIeeAeOl3KNwsuhiwa',	'jamie@jamie.com',	'Mableton',	'GA'),
+('Clare', 'clare', '$2b$10$eTwIGAx0ZtzV/ZjVC5n8WunF9YFY1gJKQU5gyEBrdEVsTMRaQ/zbG', 'clare@clare.com', 'Mableton', 'GA');
 
 insert into artists (
     name
