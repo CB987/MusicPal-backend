@@ -215,15 +215,15 @@ app.post('/APIartistList', (req, res) => {
 
     const artists = (APIArtists()
         .then(data => {
-            const artistResults= data.data.results.artistmatches.artist
+            const artistResults = data.data.results.artistmatches.artist
             // console.log(data.data.results)
             artistArray = artistResults.map(artistObj => {
                 let a = new Artist(
                     artistObj.name
-                    
+
                 )
                 console.log(a)
-                return a; 
+                return a;
 
             })
             // res.send(artistResults)
@@ -368,32 +368,35 @@ app.post('/addShowToDb', (req, res) => {
     console.log(req.body.artist);
     console.log(req.session.user)
 
-    APIEvent.addAPIEvent(
-        req.session.user, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date
-    ).then(info => {
-        Artist.add(req.body.artist)
-            .then(artist => {
-                info.artist_id = artist.id
-                return info
-            })
-            .then(info => {
-                Event.addEvent(info.artist_id, req.body.venue, req.body.city, req.body.state, req.body.date)
-                    .then(event => {
-                        info.event_id = event.id
-                        return info
-                    })
-                    .then(info => {
-                        User.getUserById(req.session.user)
-                            .then(user => {
-                                user.addUserGoingToShow(info.event_id)
-                                    .then(() => {
-                                        res.send('you did it!')
-                                    })
-                            })
-                    })
-            })
-    })
+
+    let info = APIEvent.addAPIEvent(
+        req.body.eventID,
+        req.body.artist,
+        req.body.venue,
+        req.body.city,
+        req.body.state,
+        req.body.date
+    )
+    return Artist.add(req.body.artist)
+        .then(artist => {
+            info.artist_id = artist.id
+        })
+        .then(() => {
+            Event.addEvent(req.body.eventID, info.artist_id, req.body.venue, req.body.city, req.body.state, req.body.date)
+                .then(() => {
+                    User.getUserById(req.session.user.id)
+                        .then(user => {
+                            user.addUserGoingToShow(req.body.eventID)
+                                .then(() => {
+                                    res.send('you did it!')
+                                })
+                        })
+                })
+        })
+
 })
+
+
 
 
 // ==================================================

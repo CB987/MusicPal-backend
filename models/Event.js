@@ -14,16 +14,16 @@ class Event {
     // CREATE */
     //********** 
 
-    static addEvent(artist_id, venue, city, state, date) {
+    static addEvent(id, artist_id, venue, city, state, date) {
         return db.one(`
             INSERT INTO events
-            (artist_id, venue, city, state, date)
+            (id, artist_id, venue, city, state, date)
             VALUES
-            ($1, $2, $3, $4)
+            ($1, $2, $3, $4, $5, $6)
             returning id
-            `, [artist_id, venue, city, state, date])
+            `, [id, artist_id, venue, city, state, date])
             .then(data => {
-                const e = new Event(data.id, artist_id, venue, city, state, date)
+                const e = new Event(id, artist_id, venue, city, state, date)
                 return e;
             })
     }
