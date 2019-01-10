@@ -4,8 +4,7 @@ create table users (
     username varchar(20),
     pwhash varchar(100),
     email varchar(50),
-    city text,
-    state varchar(2)
+    home varchar(50)
 );
 
 create table artists (
@@ -15,7 +14,7 @@ create table artists (
 
 create table events (
     id varchar(18) primary key,
-    artist_id integer references artists (id),
+    artist varchar(50),
     venue text,
     city text,
     state text,

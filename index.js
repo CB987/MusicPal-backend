@@ -61,11 +61,10 @@ app.post('/register', (req, res) => {
     const newUsername = req.body.username;
     const newPassword = req.body.password;
     const newEmail = req.body.email;
-    const newCity = req.body.city;
-    const newState = req.body.state;
+    const newHome = req.body.home;
     const newName = req.body.name;
 
-    User.add(newName, newUsername, newPassword, newEmail, newCity, newState)
+    User.add(newName, newUsername, newPassword, newEmail, newHome)
         .then((newUser) => {
 
             req.session.user = newUser;
@@ -111,21 +110,20 @@ app.post('/login', (req, res) => {
 // =====================
 app.get('/profile', protectRoute, (req, res) => {
     const username = req.session.user.username
-    const userCity = req.session.user.state
-    const userInfo = { username, userCity }
+    const userHome = req.session.user.home
+    const userInfo = { username, userHome }
     // let isLoggedIn = req.session.user ? true : false;
     res.send(userInfo)
 })
 
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
-    User.getUserById(1)
+    User.getUserById(res.session.user.id)
         .catch(user => {
             res.send(user);
             console.log('sending user info like a muthafucka')
         })
 })
-
 //GET USERS BY SHOW
 app.post('/showUsers', (req, res) => {
     console.log(req.body.eventID)
@@ -139,7 +137,7 @@ app.post('/showUsers', (req, res) => {
 
 //GET FRIENDS BY USER
 app.get('/myFriends', (req, res) => {
-    User.getFriendsOfUser(1)
+    User.getFriendsOfUser(req.session.user.id)
         .then(friends => {
             res.send(friends);
             console.log('friends are the glue that sticks concerts together');
@@ -182,7 +180,7 @@ const Artist = require('./models/Artist');
 
 // GET USER'S FAVORITE ARTISTS
 app.get('/myArtists', (req, res) => {
-    Artist.getArtistsByUser(1)
+    Artist.getArtistsByUser(req.session.user.id)
         .then(artists => {
             res.send(artists);
             console.log('got me some artists');
@@ -215,15 +213,15 @@ app.post('/APIartistList', (req, res) => {
 
     const artists = (APIArtists()
         .then(data => {
-            const artistResults= data.data.results.artistmatches.artist
+            const artistResults = data.data.results.artistmatches.artist
             // console.log(data.data.results)
             artistArray = artistResults.map(artistObj => {
                 let a = new Artist(
                     artistObj.name
-                    
+
                 )
                 console.log(a)
-                return a; 
+                return a;
 
             })
             // res.send(artistResults)
@@ -276,7 +274,7 @@ app.get('/eventList', (req, res) => {
 
 //GET EVENTS LIST FOR USER
 app.get('/upcomingShows', (req, res) => {
-    Event.getShowsForUser(1)
+    Event.getShowsForUser(req.session.user.id)
         .then(shows => {
             res.send(shows);
             console.log('got your user shows right here');
@@ -367,34 +365,30 @@ app.post('/APIeventList', (req, res) => {
 app.post('/addShowToDb', (req, res) => {
     console.log(req.body.artist);
     console.log(req.session.user)
-
-    APIEvent.addAPIEvent(
-        req.session.user, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date
-    ).then(info => {
-        Artist.add(req.body.artist)
-            .then(artist => {
-                info.artist_id = artist.id
-                return info
-            })
-            .then(info => {
-                Event.addEvent(info.artist_id, req.body.venue, req.body.city, req.body.state, req.body.date)
-                    .then(event => {
-                        info.event_id = event.id
-                        return info
-                    })
-                    .then(info => {
-                        User.getUserById(req.session.user)
-                            .then(user => {
-                                user.addUserGoingToShow(info.event_id)
-                                    .then(() => {
-                                        res.send('you did it!')
-                                    })
-                            })
-                    })
-            })
-    })
+    // let info = APIEvent.addAPIEvent(
+    //     req.body.eventID,
+    //     req.body.artist,
+    //     req.body.venue,
+    //     req.body.city,
+    //     req.body.state,
+    //     req.body.date
+    // )
+    // return Artist.add(req.body.artist)
+    //     .then(artist => {
+    //         info.artist_id = artist.id
+    //     })
+    //     .then(() => {
+    Event.addEvent(req.body.eventID, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date)
+        .then(() => {
+            User.getUserById(req.session.user.id)
+                .then(user => {
+                    user.addUserGoingToShow(req.body.eventID)
+                        .then(() => {
+                            res.send('you did it!')
+                        })
+                })
+        })
 })
-
 
 // ==================================================
 // Logout
