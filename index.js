@@ -191,7 +191,8 @@ app.get('/myArtists', (req, res) => {
 //====================
 app.post('/APIartistList', (req, res) => {
     console.log(req.body.artistSearch)
-    // let artistSearch = req.body.artistSearch;
+    console.log(req.body.searchArtist)
+    let artistSearch = req.body.searchArtist;
 
 
     const APIArtists = async () => {
@@ -199,9 +200,10 @@ app.post('/APIartistList', (req, res) => {
             return await axios.get(`http://ws.audioscrobbler.com/2.0/?`, {
                 params: {
                     method: `artist.search`,
-                    artist: `grimes`,
+                    artist: `${artistSearch}`,
                     api_key: `${lastfm_key}`,
-                    format: `json`
+                    format: `json`,
+                    limit: `10`
                 }
             })
         }
@@ -217,6 +219,7 @@ app.post('/APIartistList', (req, res) => {
             // console.log(data.data.results)
             artistArray = artistResults.map(artistObj => {
                 let a = new Artist(
+                    artistObj.id,
                     artistObj.name
 
                 )
