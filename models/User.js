@@ -7,31 +7,30 @@ const saltRounds = 10;
 // const saltRounds = 10;
 
 class User {
-    constructor(id, name, username, pwhash, email, city, state) {
+    constructor(id, name, username, pwhash, email, home) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.pwhash = pwhash;
         this.email = email;
-        this.city = city;
-        this.state = state;
+        this.home = home;
     }
 
     //=======
     // CREATE
     //=======
-    static add(name, username, password, email, city, state) {
+    static add(name, username, password, email, home) {
         const salt = bcrypt.genSaltSync(saltRounds);
         const hash = bcrypt.hashSync(password, salt);
         return db.one(`
         INSERT INTO users
-        (name, username, pwhash, email, city, state)
+        (name, username, pwhash, email, home)
         VALUES
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5)
         returning id
-        `, [name, username, hash, email, city, state])
+        `, [name, username, hash, email, home])
             .then(data => {
-                const u = new User(data.id, name, username, hash, email, city, state)
+                const u = new User(data.id, name, username, hash, email, home)
                 return u;
             })
     };
@@ -58,7 +57,7 @@ class User {
         WHERE id = $1
         `, [id])
             .then(result => {
-                const u = new User(result.id, result.name, result.username, result.pwhash, result.email, result.city, result.state);
+                const u = new User(result.id, result.name, result.username, result.pwhash, result.email, result.home);
                 return u;
             })
     }
@@ -69,7 +68,7 @@ class User {
             WHERE username = $1
             `, [username])
             .then(result => {
-                return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.city, result.state)
+                return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.home)
             })
     }
 
@@ -92,7 +91,7 @@ class User {
             WHERE id = $1
             `, [userObj.user_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.city, userObj.state);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home);
                             console.log(u);
                             return u;
                         })
@@ -115,7 +114,7 @@ class User {
                         WHERE id = $1
                     `, [userObj.friend_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.city, userObj.state);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home);
                             // console.log(u);
                             return u;
                         })
@@ -134,12 +133,12 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo(name, username, pwhash, email, city, state) {
+    updateUserInfo(name, username, pwhash, email, home) {
         return db.result(`
         UPDATE users
-            SET name = $2, username = $3, email = $4, city = $5, state = $6
+            SET name = $2, username = $3, email = $4, home = $5
             WHERE id= $1;
-        `, [this.id, name, username, pwhash, email, city, state])
+        `, [this.id, name, username, pwhash, email, home])
             .then(result => {
                 console.log(result)
             })
