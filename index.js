@@ -59,20 +59,30 @@ const User = require('./models/User');
 
 app.post('/register', (req, res) => {
     const newUsername = req.body.username;
-    const newPassword = req.body.password;
-    const newEmail = req.body.email;
-    const newHome = req.body.home;
-    const newName = req.body.name;
+    User.getByUsername(newUsername)
+        .then((doesExist) => {
+            res.send(`that username already exists`)
+        })
+        .catch(() => {
+            const newPassword = req.body.password;
+            const newEmail = req.body.email;
+            const newHome = req.body.home;
+            const newName = req.body.name;
+            
+            User.add(newName, newUsername, newPassword, newEmail, newHome)
+                .then((newUser) => {
 
-    User.add(newName, newUsername, newPassword, newEmail, newHome)
-        .then((newUser) => {
+                req.session.user = newUser;
+                req.session.save(() => {
+                    res.redirect('/profile')
+                })
 
-            req.session.user = newUser;
-            req.session.save(() => {
-                res.redirect('/profile')
-            })
+            });
+        })
 
-        });
+    
+
+    
 }
 
 )
