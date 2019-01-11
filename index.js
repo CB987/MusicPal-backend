@@ -57,7 +57,7 @@ const User = require('./models/User');
 // User registration
 // =====================
 
-app.post('/registerAPI', (req, res) => {
+app.post('/API/register', (req, res) => {
     const newUsername = req.body.username;
 
     User.getByUsername(newUsername)
@@ -65,9 +65,16 @@ app.post('/registerAPI', (req, res) => {
             console.log(doesExist)
             if (doesExist) {
                 console.log('this user already exists')
-                res.json({ status: "taken" })
-            } else {
-                console.log('new user added')
+
+                res.json({status: "taken"})
+            } 
+                
+            
+        })
+        .catch((err) => {
+            console.log('theres been an error')
+            console.log('new user added')
+
                 const newPassword = req.body.password;
                 const newEmail = req.body.email;
                 const newHome = req.body.home;
@@ -80,40 +87,38 @@ app.post('/registerAPI', (req, res) => {
                             res.json({ status: "good to go" })
                         })
                     });
-            }
-        })
-        .catch((err) => {
-            console.log(err)
         });
 });
 
 // =====================
 // User Login
 // =====================
-app.post('/login', (req, res) => {
+app.post('/API/login', (req, res) => {
     const theUsername = req.body.username;
     const thePassword = req.body.password;
     User.getByUsername(theUsername)
-        .catch((err) => {
-            console.log(err);
-            res.redirect('/login')
+        .then((theUser) => {
+            console.log(theUser)
+        if (theUser.passwordDoesMatch(thePassword)) {
+            req.session.user = theUser
+            console.log(`you're in`)
+            console.log(`${req.session.user.username}`)
+            req.session.save(() => {
+                res.json({status: 'good to go'})
+            })
+            
+        } else {
+            console.log('username or password incorrect')
+            res.json({status: 'incorrect'})
+        }
+    })
+    // .catch((doesnotMatch) => {
+    //     if (doesnotMatch) {
+            
+    //     }
+    // })
         })
-        .then(theUser => {
-            if (theUser.passwordDoesMatch(thePassword)) {
-                req.session.user = theUser
-                console.log(`you're in`)
-                console.log(`${req.session.user.username}`)
-                req.session.save(() => {
-                    res.redirect('/profile');
-                })
-
-            } else {
-                console.log(`you're out`)
-                res.redirect('/login');
-            }
-
-        })
-})
+        
 
 // =====================
 // User Profile
