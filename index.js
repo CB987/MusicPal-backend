@@ -65,19 +65,19 @@ app.post('/registerAPI', (req, res) => {
             console.log(doesExist)
             if (doesExist) {
                 console.log('this user already exists')
-                res.json({status: "taken"})
+                res.json({ status: "taken" })
             } else {
                 console.log('new user added')
                 const newPassword = req.body.password;
                 const newEmail = req.body.email;
                 const newHome = req.body.home;
                 const newName = req.body.name;
-                
+
                 User.add(newName, newUsername, newPassword, newEmail, newHome)
                     .then((newUser) => {
                         req.session.user = newUser;
                         req.session.save(() => {
-                            res.json({status: "good to go"})
+                            res.json({ status: "good to go" })
                         })
                     });
             }
@@ -86,15 +86,6 @@ app.post('/registerAPI', (req, res) => {
             console.log(err)
         });
 });
-    
-       
-       
-
-    
-
-      
-
-
 
 // =====================
 // User Login
@@ -206,7 +197,14 @@ app.get('/myFriends', (req, res) => {
 const Artist = require('./models/Artist');
 
 // ADD ARTIST
-// Artist.add('Meiko');
+app.get('/addArtistToUser', (req, res) => {
+    Artist.add(req.body.artist)
+        .then(thisArtistInstance => {
+            thisArtistInstance.addArtistToUser(req.session.user.id)
+            console.log('the universe is expanding')
+        })
+})
+
 
 // GET USER'S FAVORITE ARTISTS
 app.get('/myArtists', (req, res) => {
@@ -246,12 +244,11 @@ app.post('/APIartistList', (req, res) => {
     const artists = (APIArtists()
         .then(data => {
             const artistResults = data.data.results.artistmatches.artist
-            // console.log(data.data.results)
+            console.log(data.data.results)
             artistArray = artistResults.map(artistObj => {
                 let a = new Artist(
-                    artistObj.id,
+                    artistObj.mbid,
                     artistObj.name
-
                 )
                 console.log(a)
                 return a;
@@ -321,6 +318,12 @@ app.get('/upcomingShows', (req, res) => {
             console.log('got your user shows right here');
         });
 });
+
+//DELETE EVENT FROM USER
+app.post('/deleteEventfromUser', (req, res) => {
+
+    Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
+})
 
 //=============
 //EVENTS FROM API
@@ -423,9 +426,15 @@ app.post('/addShowToDb', (req, res) => {
         .then(() => {
             User.addUserGoingToShow(req.session.user.id, req.body.eventID)
                 .then(() => {
-                    res.send('you did it!')
+                    res.json({ message: 'all good' })
                 })
-        })
+        }).catch(
+            error => {
+                res.json({
+                    message: 'no good'
+                })
+            }
+        )
 })
 
 

@@ -112,6 +112,24 @@ class Event {
             })
     }
 
+    // ******
+    // DELETE
+    // ******
+
+    static deleteEventfromEvents(eventID) {
+        return db.one(`
+        DELETE FROM events
+            WHERE id = $1;
+        `, [eventID]);
+    }
+
+    static deleteEventfromUserShows(event_id, user_id) {
+        return db.one(`
+        DELETE FROM user_shows
+            WHERE event_id = $1 AND user_id = $2;
+        `, [event_id, user_id]);
+    }
+
 }
 
 module.exports = Event;

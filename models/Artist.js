@@ -23,6 +23,19 @@ class Artist {
             })
     };
 
+    addArtistToUser(user_id) {
+        return db.one(`
+            INSERT INTO user_artists
+            (user_id, artist_id)
+            VALUES
+            ($1, $2)
+            returning id
+        ` [user_id, this.id])
+            .then(result => {
+                console.log(result)
+            })
+    }
+
     //========
     //RETRIEVE
     //========
