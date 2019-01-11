@@ -57,7 +57,7 @@ const User = require('./models/User');
 // User registration
 // =====================
 
-app.post('/registerAPI', (req, res) => {
+app.post('/API/register', (req, res) => {
     const newUsername = req.body.username;
 
     User.getByUsername(newUsername)
@@ -66,8 +66,13 @@ app.post('/registerAPI', (req, res) => {
             if (doesExist) {
                 console.log('this user already exists')
                 res.json({status: "taken"})
-            } else {
-                console.log('new user added')
+            } 
+                
+            
+        })
+        .catch((err) => {
+            console.log('theres been an error')
+            console.log('new user added')
                 const newPassword = req.body.password;
                 const newEmail = req.body.email;
                 const newHome = req.body.home;
@@ -80,10 +85,6 @@ app.post('/registerAPI', (req, res) => {
                             res.json({status: "good to go"})
                         })
                     });
-            }
-        })
-        .catch((err) => {
-            console.log(err)
         });
 });
     
