@@ -57,35 +57,44 @@ const User = require('./models/User');
 // User registration
 // =====================
 
-app.post('/register', (req, res) => {
+app.post('/registerAPI', (req, res) => {
     const newUsername = req.body.username;
+
     User.getByUsername(newUsername)
         .then((doesExist) => {
-            res.send(`that username already exists`)
+            console.log(doesExist)
+            if (doesExist) {
+                console.log('this user already exists')
+                res.json({status: "taken"})
+            } else {
+                console.log('new user added')
+                const newPassword = req.body.password;
+                const newEmail = req.body.email;
+                const newHome = req.body.home;
+                const newName = req.body.name;
+                
+                User.add(newName, newUsername, newPassword, newEmail, newHome)
+                    .then((newUser) => {
+                        req.session.user = newUser;
+                        req.session.save(() => {
+                            res.json({status: "good to go"})
+                        })
+                    });
+            }
         })
-        .catch(() => {
-            const newPassword = req.body.password;
-            const newEmail = req.body.email;
-            const newHome = req.body.home;
-            const newName = req.body.name;
-            
-            User.add(newName, newUsername, newPassword, newEmail, newHome)
-                .then((newUser) => {
-
-                req.session.user = newUser;
-                req.session.save(() => {
-                    res.redirect('/profile')
-                })
-
-            });
-        })
+        .catch((err) => {
+            console.log(err)
+        });
+});
+    
+       
+       
 
     
 
-    
-}
+      
 
-)
+
 
 // =====================
 // User Login
