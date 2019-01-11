@@ -35,14 +35,14 @@ class User {
             })
     };
 
-    addUserGoingToShow(event_id) {
+    static addUserGoingToShow(id, event_id) {
         return db.one(`
         INSERT INTO user_shows
         (user_id, event_id)
         VALUES
         ($1, $2)
         returning id
-        `, [this.id, event_id])
+        `, [id, event_id])
             .then(result => {
                 console.log(result);
             })
