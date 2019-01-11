@@ -154,6 +154,17 @@ app.post('/showUsers', (req, res) => {
         })
 })
 
+//ADD USER GOING TO SHOW
+app.post('/addUserGoingToShow', (req, res) => {
+    console.log(`${req.session.user.username} wants to see ${req.body.eventID} like a boss`)
+    let eventID = req.body.eventID;
+    User.addUserGoingToShow(req.session.user.id, eventID)
+        .then(shows => {
+            res.send(shows);
+            console.log('confirm boss status');
+        })
+})
+
 //GET FRIENDS BY USER
 app.get('/myFriends', (req, res) => {
     User.getFriendsOfUser(req.session.user.id)
@@ -268,8 +279,16 @@ const Event = require('./models/Event');
 //GET EVENT BY ARTIST
 // Event.getByArtist('amelia');
 
-//GET EVENT BY EVENT ID
-//Event.getEventById(3);
+// GET EVENT BY EVENT ID
+app.get('/isInDb', (req, res) => {
+
+    Event.getEventById(req.body.eventID)
+    then(existingEvent => {
+        res.send(existingEvent);
+        console.log(`confirm ${event.name} is in db`)
+    })
+
+})
 
 //GET EVENT BY LOCATION
 // Event.getByLocation('atlanta');
@@ -386,7 +405,7 @@ app.post('/APIeventList', (req, res) => {
 
 app.post('/addShowToDb', (req, res) => {
     console.log(req.body.artist);
-    console.log(req.session.user)
+    console.log(req.session.user.username)
     // let info = APIEvent.addAPIEvent(
     //     req.body.eventID,
     //     req.body.artist,
@@ -402,15 +421,13 @@ app.post('/addShowToDb', (req, res) => {
     //     .then(() => {
     Event.addEvent(req.body.eventID, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date)
         .then(() => {
-            User.getUserById(req.session.user.id)
-                .then(user => {
-                    user.addUserGoingToShow(req.body.eventID)
-                        .then(() => {
-                            res.send('you did it!')
-                        })
+            User.addUserGoingToShow(req.session.user.id, req.body.eventID)
+                .then(() => {
+                    res.send('you did it!')
                 })
         })
 })
+
 
 // ==================================================
 // Logout
