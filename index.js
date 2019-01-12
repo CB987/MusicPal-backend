@@ -65,7 +65,6 @@ app.post('/API/register', (req, res) => {
             console.log(doesExist)
             if (doesExist) {
                 console.log('this user already exists')
-
                 res.json({status: "taken"})
             } 
                 
@@ -74,21 +73,29 @@ app.post('/API/register', (req, res) => {
         .catch((err) => {
             console.log('theres been an error')
             console.log('new user added')
-
                 const newPassword = req.body.password;
                 const newEmail = req.body.email;
                 const newHome = req.body.home;
                 const newName = req.body.name;
-
+                
                 User.add(newName, newUsername, newPassword, newEmail, newHome)
                     .then((newUser) => {
                         req.session.user = newUser;
                         req.session.save(() => {
-                            res.json({ status: "good to go" })
+                            res.json({status: "good to go"})
                         })
                     });
         });
 });
+    
+       
+       
+
+    
+
+      
+
+
 
 // =====================
 // User Login
@@ -97,9 +104,11 @@ app.post('/API/login', (req, res) => {
     const theUsername = req.body.username;
     const thePassword = req.body.password;
     User.getByUsername(theUsername)
+
+       
         .then((theUser) => {
             console.log(theUser)
-        if (theUser.passwordDoesMatch(thePassword)) {
+            if (theUser.passwordDoesMatch(thePassword)) {
             req.session.user = theUser
             console.log(`you're in`)
             console.log(`${req.session.user.username}`)
@@ -112,13 +121,7 @@ app.post('/API/login', (req, res) => {
             res.json({status: 'incorrect'})
         }
     })
-    // .catch((doesnotMatch) => {
-    //     if (doesnotMatch) {
-            
-    //     }
-    // })
-        })
-        
+})
 
 // =====================
 // User Profile
@@ -202,17 +205,10 @@ app.get('/myFriends', (req, res) => {
 const Artist = require('./models/Artist');
 
 // ADD ARTIST
-app.get('/addArtistToUser', (req, res) => {
-    Artist.add(req.body.artist)
-        .then(thisArtistInstance => {
-            thisArtistInstance.addArtistToUser(req.session.user.id)
-            console.log('the universe is expanding')
-        })
-})
-
+// Artist.add('Meiko');
 
 // GET USER'S FAVORITE ARTISTS
-app.get('/myArtists', (req, res) => {
+app.post('/myArtists', (req, res) => {
     Artist.getArtistsByUser(req.session.user.id)
         .then(artists => {
             res.send(artists);
@@ -249,11 +245,12 @@ app.post('/APIartistList', (req, res) => {
     const artists = (APIArtists()
         .then(data => {
             const artistResults = data.data.results.artistmatches.artist
-            console.log(data.data.results)
+            // console.log(data.data.results)
             artistArray = artistResults.map(artistObj => {
                 let a = new Artist(
-                    artistObj.mbid,
+                    artistObj.id,
                     artistObj.name
+
                 )
                 console.log(a)
                 return a;
@@ -272,6 +269,37 @@ app.post('/APIartistList', (req, res) => {
             console.error(error)
         })
 })
+
+// ==================
+// ADD ARTIST
+// ==================
+app.post('/addArtistToUser', (req, res) => {
+    Artist.add(req.body.artist)
+        
+
+    .then(() => {
+        Artist.addArtistToUser(req.session.user.id, req.body.id)
+        console.log('adding to users artists')
+    })
+    // return info
+    // .then (console.log(info)  )          
+    // Artist.add(req.body.artist)
+    //     .then(() => {
+
+    //     })
+    // return info.artist_id
+    //     .then(artist => {
+    //         info.artist_id = artist.id
+    //     })
+    //     .then(() => {
+    //         Artist.addArtistToUser(req.session.user.id, artist.id )
+    //         console.log('artist added to your shows')
+    //     })
+        // .then(thisArtistInstance => {
+        //     thisArtistInstance.addArtistToUser(req.session.user.id, )
+        //     console.log('the universe is expanding')
+        })
+
 
 //=============
 //EVENT METHODS
@@ -323,12 +351,6 @@ app.get('/upcomingShows', (req, res) => {
             console.log('got your user shows right here');
         });
 });
-
-//DELETE EVENT FROM USER
-app.post('/deleteEventfromUser', (req, res) => {
-
-    Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
-})
 
 //=============
 //EVENTS FROM API
@@ -431,15 +453,9 @@ app.post('/addShowToDb', (req, res) => {
         .then(() => {
             User.addUserGoingToShow(req.session.user.id, req.body.eventID)
                 .then(() => {
-                    res.json({ message: 'all good' })
+                    res.send('you did it!')
                 })
-        }).catch(
-            error => {
-                res.json({
-                    message: 'no good'
-                })
-            }
-        )
+        })
 })
 
 
