@@ -124,12 +124,17 @@ app.post('/API/login', (req, res) => {
 // User Profile
 // =====================
 app.get('/profile', protectRoute, (req, res) => {
-    console.log('getting profile')
-    const username = req.session.user.username
-    const userHome = req.session.user.home
-    const userInfo = { username, userHome }
-    // let isLoggedIn = req.session.user ? true : false;
-    res.send(userInfo)
+    // console.log('getting profile')
+    // const username = req.session.user.username
+    // const userHome = req.session.user.home
+    // const userInfo = { username, userHome }
+    // // let isLoggedIn = req.session.user ? true : false;
+    // res.send(userInfo)
+    User.getUserById(req.session.user.id)
+        .then(user => {
+            res.send(user);
+            console.log('sending user info like a muthafucka')
+        })
 })
 
 // ==================
@@ -184,6 +189,14 @@ app.post('/palProfile', (req, res) => {
         })
 })
 
+//GET OTHER USER FRIENDS
+app.post('/palFriends', (req, res) => {
+    User.getFriendsOfUser(req.body.userID)
+        .then(friends => {
+            res.send(friends);
+            console.log('keep your friends\' friends close...')
+        })
+})
 //UPDATE USER INFO
 // User.getUserById(id)
 //     .then(userObj => {
@@ -216,14 +229,13 @@ app.post('/palProfile', (req, res) => {
 const Artist = require('./models/Artist');
 
 // ADD ARTIST
-app.get('/addArtistToUser', (req, res) => {
+app.post('/addArtistToUser', (req, res) => {
     Artist.add(req.body.artist)
         .then(thisArtistInstance => {
             thisArtistInstance.addArtistToUser(req.session.user.id)
             console.log('the universe is expanding')
         })
 })
-
 
 // GET USER'S FAVORITE ARTISTS
 app.get('/myArtists', (req, res) => {
@@ -233,6 +245,16 @@ app.get('/myArtists', (req, res) => {
             console.log('got me some artists');
         });
 });
+
+//GET OTHER's FAVE ARTISTS
+app.post('/palArtists', (req, res) => {
+    Artist.getArtistsByUser(req.body.userID)
+        .then(artists => {
+            res.send(artists);
+            console.log('keep their artists closer');
+        })
+
+})
 //===================
 // Artists from API
 //====================
