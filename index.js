@@ -31,7 +31,7 @@ function protectRoute(req, res, next) {
     let isLoggedIn = req.session.user ? true : false;
 
     if (isLoggedIn) {
-        console.log(`${req.session.user} is logged in`);
+        console.log(`${req.session.user.name} is logged in`);
         next();
     } else {
         console.log('not logged in');
@@ -66,27 +66,27 @@ app.post('/API/register', (req, res) => {
             if (doesExist) {
                 console.log('this user already exists')
 
-                res.json({status: "taken"})
-            } 
-                
-            
+                res.json({ status: "taken" })
+            }
+
+
         })
         .catch((err) => {
             console.log('theres been an error')
             console.log('new user added')
 
-                const newPassword = req.body.password;
-                const newEmail = req.body.email;
-                const newHome = req.body.home;
-                const newName = req.body.name;
+            const newPassword = req.body.password;
+            const newEmail = req.body.email;
+            const newHome = req.body.home;
+            const newName = req.body.name;
 
-                User.add(newName, newUsername, newPassword, newEmail, newHome)
-                    .then((newUser) => {
-                        req.session.user = newUser;
-                        req.session.save(() => {
-                            res.json({ status: "good to go" })
-                        })
-                    });
+            User.add(newName, newUsername, newPassword, newEmail, newHome)
+                .then((newUser) => {
+                    req.session.user = newUser;
+                    req.session.save(() => {
+                        res.json({ status: "good to go" })
+                    })
+                });
         });
 });
 
@@ -99,31 +99,32 @@ app.post('/API/login', (req, res) => {
     User.getByUsername(theUsername)
         .then((theUser) => {
             console.log(theUser)
-        if (theUser.passwordDoesMatch(thePassword)) {
-            req.session.user = theUser
-            console.log(`you're in`)
-            console.log(`${req.session.user.username}`)
-            req.session.save(() => {
-                res.json({status: 'good to go'})
-            })
-            
-        } else {
-            console.log('username or password incorrect')
-            res.json({status: 'incorrect'})
-        }
-    })
+            if (theUser.passwordDoesMatch(thePassword)) {
+                req.session.user = theUser
+                console.log(`you're in`)
+                console.log(`${req.session.user.username}`)
+                req.session.save(() => {
+                    res.json({ status: 'good to go' })
+                })
+
+            } else {
+                console.log('username or password incorrect')
+                res.json({ status: 'incorrect' })
+            }
+        })
     // .catch((doesnotMatch) => {
     //     if (doesnotMatch) {
-            
+
     //     }
     // })
-        })
-        
+})
+
 
 // =====================
 // User Profile
 // =====================
 app.get('/profile', protectRoute, (req, res) => {
+    console.log('getting profile')
     const username = req.session.user.username
     const userHome = req.session.user.home
     const userInfo = { username, userHome }
@@ -131,6 +132,9 @@ app.get('/profile', protectRoute, (req, res) => {
     res.send(userInfo)
 })
 
+// ==================
+// Other User Methods
+// ==================
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
     User.getUserById(res.session.user.id)
@@ -169,6 +173,16 @@ app.get('/myFriends', (req, res) => {
             console.log('friends are the glue that sticks concerts together');
         });
 });
+
+//GET USER AS PAL
+app.post('/palProfile', (req, res) => {
+    console.log('HELLO')
+    User.getUserById(req.body.userID)
+        .then(pal => {
+            res.send(pal);
+            console.log(`here's the dirt on your friend ${pal.username}`)
+        })
+})
 
 //UPDATE USER INFO
 // User.getUserById(id)
@@ -315,12 +329,23 @@ app.get('/eventList', (req, res) => {
 //         })
 // });
 
-//GET EVENTS LIST FOR USER
+//GET EVENTS LIST FOR USER LOGGED IN
 app.get('/upcomingShows', (req, res) => {
+    // let id = req.body.userID
     Event.getShowsForUser(req.session.user.id)
         .then(shows => {
             res.send(shows);
             console.log('got your user shows right here');
+        });
+});
+
+//GET EVENTS LIST FOR OTHER USER
+app.post('/otherShows', (req, res) => {
+    console.log(`${req.body.userID} motherfucker`)
+    Event.getShowsForUser(req.body.userID)
+        .then(shows => {
+            res.send(shows);
+            console.log('sending other shows');
         });
 });
 
