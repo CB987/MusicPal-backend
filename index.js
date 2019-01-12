@@ -31,7 +31,7 @@ function protectRoute(req, res, next) {
     let isLoggedIn = req.session.user ? true : false;
 
     if (isLoggedIn) {
-        console.log(`${req.session.user} is logged in`);
+        console.log(`${req.session.user.name} is logged in`);
         next();
     } else {
         console.log('not logged in');
@@ -67,8 +67,7 @@ app.post('/API/register', (req, res) => {
                 console.log('this user already exists')
                 res.json({status: "taken"})
             } 
-                
-            
+           
         })
         .catch((err) => {
             console.log('theres been an error')
@@ -123,17 +122,27 @@ app.post('/API/login', (req, res) => {
     })
 })
 
+
 // =====================
 // User Profile
 // =====================
 app.get('/profile', protectRoute, (req, res) => {
-    const username = req.session.user.username
-    const userHome = req.session.user.home
-    const userInfo = { username, userHome }
-    // let isLoggedIn = req.session.user ? true : false;
-    res.send(userInfo)
+    // console.log('getting profile')
+    // const username = req.session.user.username
+    // const userHome = req.session.user.home
+    // const userInfo = { username, userHome }
+    // // let isLoggedIn = req.session.user ? true : false;
+    // res.send(userInfo)
+    User.getUserById(req.session.user.id)
+        .then(user => {
+            res.send(user);
+            console.log('sending user info like a muthafucka')
+        })
 })
 
+// ==================
+// Other User Methods
+// ==================
 //GET USER BY ID
 app.get('/myInfo', (req, res) => {
     User.getUserById(res.session.user.id)
@@ -173,6 +182,24 @@ app.get('/myFriends', (req, res) => {
         });
 });
 
+//GET USER AS PAL
+app.post('/palProfile', (req, res) => {
+    console.log('HELLO')
+    User.getUserById(req.body.userID)
+        .then(pal => {
+            res.send(pal);
+            console.log(`here's the dirt on your friend ${pal.username}`)
+        })
+})
+
+//GET OTHER USER FRIENDS
+app.post('/palFriends', (req, res) => {
+    User.getFriendsOfUser(req.body.userID)
+        .then(friends => {
+            res.send(friends);
+            console.log('keep your friends\' friends close...')
+        })
+})
 //UPDATE USER INFO
 // User.getUserById(id)
 //     .then(userObj => {
@@ -204,9 +231,6 @@ app.get('/myFriends', (req, res) => {
 //==============
 const Artist = require('./models/Artist');
 
-// ADD ARTIST
-// Artist.add('Meiko');
-
 // GET USER'S FAVORITE ARTISTS
 app.post('/myArtists', (req, res) => {
     Artist.getArtistsByUser(req.session.user.id)
@@ -215,6 +239,16 @@ app.post('/myArtists', (req, res) => {
             console.log('got me some artists');
         });
 });
+
+//GET OTHER's FAVE ARTISTS
+app.post('/palArtists', (req, res) => {
+    Artist.getArtistsByUser(req.body.userID)
+        .then(artists => {
+            res.send(artists);
+            console.log('keep their artists closer');
+        })
+
+})
 //===================
 // Artists from API
 //====================
@@ -343,14 +377,31 @@ app.get('/eventList', (req, res) => {
 //         })
 // });
 
-//GET EVENTS LIST FOR USER
+//GET EVENTS LIST FOR USER LOGGED IN
 app.get('/upcomingShows', (req, res) => {
+    // let id = req.body.userID
     Event.getShowsForUser(req.session.user.id)
         .then(shows => {
             res.send(shows);
             console.log('got your user shows right here');
         });
 });
+
+//GET EVENTS LIST FOR OTHER USER
+app.post('/otherShows', (req, res) => {
+    console.log(`${req.body.userID} motherfucker`)
+    Event.getShowsForUser(req.body.userID)
+        .then(shows => {
+            res.send(shows);
+            console.log('sending other shows');
+        });
+});
+
+//DELETE EVENT FROM USER
+app.post('/deleteEventfromUser', (req, res) => {
+
+    Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
+})
 
 //=============
 //EVENTS FROM API
