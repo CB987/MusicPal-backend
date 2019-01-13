@@ -118,16 +118,11 @@ app.post('/API/login', (req, res) => {
 // User Profile
 // =====================
 app.get('/profile', protectRoute, (req, res) => {
-    // console.log('getting profile')
-    // const username = req.session.user.username
-    // const userHome = req.session.user.home
-    // const userInfo = { username, userHome }
-    // // let isLoggedIn = req.session.user ? true : false;
-    // res.send(userInfo)
+
     User.getUserById(req.session.user.id)
         .then(user => {
             res.send(user);
-            console.log('sending user info like a muthafucka')
+            console.log(`sending ${user.likes} info like a mutha`)
         })
 })
 
@@ -202,13 +197,16 @@ app.post('/palFriends', (req, res) => {
 //have to delete from all the tables where it is a foreign key first, then delete from user table
 app.get('/deleteAll', (req, res) => {
     console.log('my name is delete')
-    User.deleteUserFromEvent(req.session.user.id)
+        // User.deleteUserFromEvent(req.session.user.id)
 
-        .then(User.deleteUserFromFriendsUsers(req.session.user.id))
+        //     .then(User.deleteUserFromFriendsUsers(req.session.user.id))
 
-        .then(User.deleteUserFromFriendsFriends(req.session.user.id))
-        .then(User.deleteUser(req.session.user.id))
-    console.log('you have been deleted')
+        //     .then(User.deleteUserFromFriendsFriends(req.session.user.id))
+        (User.deleteUser(req.session.user.id))
+        .then(stuff => {
+            console.log(`you have been deleted and ${stuff}`)
+        })
+
         .then(res.send('your account has been deleted'))
 
         .catch(error => {
