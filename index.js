@@ -308,13 +308,18 @@ app.post('/APIartistList', (req, res) => {
 // ADD ARTIST
 // ==================
 app.post('/addArtistToUser', (req, res) => {
-    Artist.add(req.body.artist)
-        
-
-    .then(() => {
-        Artist.addArtistToUser(req.session.user.id, req.body.id)
-        console.log('adding to users artists')
-    })
+    Artist.addArtistToUser(req.body.artist, req.session.user.id)
+    
+//    const newArtist = new Artist(req.body.artist)
+//    console.log(newArtist)
+//    const dbArtist = new Artist(newArtist.id)
+//    Artist.add(dbArtist.id)
+//     .then(() => {
+//         dbArtist.addArtistToUser(req.session.user.id)
+//         console.log('adding to users artists')
+//     })
+    
+   
     // return info
     // .then (console.log(info)  )          
     // Artist.add(req.body.artist)
