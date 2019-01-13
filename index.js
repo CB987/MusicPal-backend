@@ -232,7 +232,7 @@ app.post('/palFriends', (req, res) => {
 const Artist = require('./models/Artist');
 
 // GET USER'S FAVORITE ARTISTS
-app.post('/myArtists', (req, res) => {
+app.get('/myArtists', (req, res) => {
     Artist.getArtistsByUser(req.session.user.id)
         .then(artists => {
             res.send(artists);
@@ -309,7 +309,7 @@ app.post('/APIartistList', (req, res) => {
 // ==================
 app.post('/addArtistToUser', (req, res) => {
     Artist.addArtistToUser(req.body.artist, req.session.user.id)
-    
+
 //    const newArtist = new Artist(req.body.artist)
 //    console.log(newArtist)
 //    const dbArtist = new Artist(newArtist.id)
