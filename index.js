@@ -87,15 +87,6 @@ app.post('/API/register', (req, res) => {
         });
 });
 
-
-
-
-
-
-
-
-
-
 // =====================
 // User Login
 // =====================
@@ -210,23 +201,21 @@ app.post('/palFriends', (req, res) => {
 //DELETE USER
 //have to delete from all the tables where it is a foreign key first, then delete from user table
 app.get('/deleteAll', (req, res) => {
-    User.getUserById(req.session.user.id)
-        .then(userObj => {
-            userObj.deleteUserFromEvent();
-            return userObj
+    console.log('my name is delete')
+    User.deleteUserFromEvent(req.session.user.id)
+
+        .then(User.deleteUserFromFriendsUsers(req.session.user.id))
+
+        .then(User.deleteUserFromFriendsFriends(req.session.user.id))
+        .then(User.deleteUser(req.session.user.id))
+    console.log('you have been deleted')
+        .then(res.send('your account has been deleted'))
+
+        .catch(error => {
+            console.error(error)
         })
-        .then(userObj => {
-            userObj.deleteUserFromFriendsUsers();
-            return userObj
-        })
-        .then(userObj => {
-            userObj.deleteUserFromFriendsFriends();
-            return userObj
-        })
-        .then(userObj => {
-            userObj.deleteUser();
-        })
-})
+});
+
 
 //==============
 //ARTIST METHODS
@@ -249,8 +238,11 @@ app.post('/palArtists', (req, res) => {
             res.send(artists);
             console.log('keep their artists closer');
         })
+        .catch(error => {
+            console.error(error)
+        })
+});
 
-})
 //===================
 // Artists from API
 //====================
@@ -304,7 +296,7 @@ app.post('/APIartistList', (req, res) => {
         .catch(error => {
             console.error(error)
         })
-})
+});
 
 // ==================
 // ADD ARTIST
@@ -334,7 +326,7 @@ app.post('/addArtistToUser', (req, res) => {
     // .then(thisArtistInstance => {
     //     thisArtistInstance.addArtistToUser(req.session.user.id, )
     //     console.log('the universe is expanding')
-})
+});
 
 
 //=============
@@ -354,7 +346,7 @@ app.get('/isInDb', (req, res) => {
         console.log(`confirm ${event.name} is in db`)
     })
 
-})
+});
 
 //GET EVENT BY LOCATION
 // Event.getByLocation('atlanta');
@@ -403,7 +395,7 @@ app.post('/otherShows', (req, res) => {
 app.post('/deleteEventfromUser', (req, res) => {
 
     Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
-})
+});
 
 //=============
 //EVENTS FROM API
@@ -484,7 +476,7 @@ app.post('/APIeventList', (req, res) => {
             console.error(error)
         }))
     console.log('api call nailed!');
-})
+});
 
 app.post('/addShowToDb', (req, res) => {
     console.log(req.body.artist);
@@ -509,7 +501,7 @@ app.post('/addShowToDb', (req, res) => {
                     res.send('you did it!')
                 })
         })
-})
+});
 
 
 // ==================================================

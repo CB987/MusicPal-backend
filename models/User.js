@@ -160,32 +160,32 @@ class User {
     //======
     //DELETE
     //======
-    deleteUserFromEvent() {
+    static deleteUserFromEvent(id) {
         return db.any(`
         DELETE FROM user_shows 
             WHERE user_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUserFromFriendsUsers() {
+    static deleteUserFromFriendsUsers(id) {
         return db.any(`
-        DELETE FROM friends 
+        DELETE FROM user_friends 
             WHERE user_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUserFromFriendsFriends() {
+    static deleteUserFromFriendsFriends(id) {
         return db.any(`
-        DELETE FROM friends 
+        DELETE FROM user_friends 
             WHERE friend_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUser() {
+    static deleteUser(id) {
         return db.result(`
         DELETE FROM users
             WHERE id = $1 ;
-        `, [this.id]);
+        `, [id]);
     }
 }
 
