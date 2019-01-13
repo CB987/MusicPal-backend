@@ -152,7 +152,7 @@ class User {
     updateUserInfo(name, username, pwhash, email, home, likes, dislikes, pal) {
         return db.result(`
         UPDATE users
-            SET name = $2, username = $3, email = $4, home = $5
+            SET name = $2, username = $3, pwhash = $4, email = $5, home = $6, likes = $7, dislikes = $8, pal = $9
             WHERE id= $1;
         `, [this.id, name, username, pwhash, email, home, likes, dislikes, pal])
             .then(result => {
