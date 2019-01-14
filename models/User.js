@@ -27,9 +27,9 @@ class User {
         const hash = bcrypt.hashSync(password, salt);
         return db.one(`
         INSERT INTO users
-        (name, username, pwhash, email, home)
+        (name, username, pwhash, email, home, likes, dislikes, pal)
         VALUES
-        ($1, $2, $3, $4, $5)
+        ($1, $2, $3, $4, $5, $6, $7, $8)
         returning id
         `, [name, username, hash, email, home, likes, dislikes, pal])
             .then(data => {
@@ -149,15 +149,18 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo(name, username, pwhash, email, home, likes, dislikes, pal) {
+    static updateUserInfo(id, name, username, pwhash, email, home, likes, dislikes, pal) {
         return db.result(`
         UPDATE users
-            SET name = $2, username = $3, email = $4, home = $5
+            SET name = $2, username = $3, pwhash = $4, email = $5, home = $6, likes = $7, dislikes = $8, pal = $9
             WHERE id= $1;
-        `, [this.id, name, username, pwhash, email, home, likes, dislikes, pal])
-            .then(result => {
-                console.log(result)
+        `, [id, name, username, pwhash, email, home, likes, dislikes, pal])
+            .then(userObj => {
+                let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home, userObj.likes, userObj.dislikes, userObj.pal);
+                // console.log(u);
+                return u;
             })
+
     };
 
     //======

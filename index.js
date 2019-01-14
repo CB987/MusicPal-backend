@@ -73,11 +73,14 @@ app.post('/API/register', (req, res) => {
             console.log('theres been an error')
             console.log('new user added')
             const newPassword = req.body.password;
-            const newEmail = req.body.email;
+            const newEmail = req.body.emailAddress;
             const newHome = req.body.home;
             const newName = req.body.name;
+            const newLikes = req.body.likes;
+            const newDislikes = req.body.dislikes;
+            const newPal = req.body.pal;
 
-            User.add(newName, newUsername, newPassword, newEmail, newHome)
+            User.add(newName, newUsername, newPassword, newEmail, newHome, newLikes, newDislikes, newPal)
                 .then((newUser) => {
                     req.session.user = newUser;
                     req.session.save(() => {
@@ -187,25 +190,31 @@ app.post('/palFriends', (req, res) => {
         })
 })
 //UPDATE USER INFO
-// User.getUserById(id)
-//     .then(userObj => {
-//         userObj.updateUserInfo('Steven', 'sKim', 'skim@skim.com', 'Johns Creek', 'GA')
-//     });
+app.post('/updateUser', (req, res) => {
+
+    User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
+        .then(newUser => {
+            res.send(newUser);
+        })
+    console.log('user updated?')
+});
+
 
 
 //DELETE USER
 //have to delete from all the tables where it is a foreign key first, then delete from user table
 app.get('/deleteAll', (req, res) => {
     console.log('my name is delete')
-        // User.deleteUserFromEvent(req.session.user.id)
+    // User.deleteUserFromEvent(req.session.user.id)
 
-        //     .then(User.deleteUserFromFriendsUsers(req.session.user.id))
+    //     .then(User.deleteUserFromFriendsUsers(req.session.user.id))
 
-        //     .then(User.deleteUserFromFriendsFriends(req.session.user.id))
-        (User.deleteUser(req.session.user.id))
-        .then(stuff => {
-            console.log(`you have been deleted and ${stuff}`)
-        })
+    //     .then(User.deleteUserFromFriendsFriends(req.session.user.id))
+    User.deleteUser(req.session.user.id)
+        .then(
+            console.log('you have been deleted and')
+
+        )
 
         .then(res.send('your account has been deleted'))
 
