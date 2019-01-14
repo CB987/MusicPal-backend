@@ -186,11 +186,16 @@ app.post('/palFriends', (req, res) => {
             console.log('keep your friends\' friends close...')
         })
 })
+
 //UPDATE USER INFO
-// User.getUserById(id)
-//     .then(userObj => {
-//         userObj.updateUserInfo('Steven', 'sKim', 'skim@skim.com', 'Johns Creek', 'GA')
-//     });
+app.post('/updateUser', (req, res) => {
+
+    User.getUserById(req.session.user.id)
+        .then(userObj => {
+            userObj.updateUserInfo(req.body.name, req.body.username, req.body.email, req.body.password, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
+            console.log('user updated?')
+        });
+})
 
 
 //DELETE USER
