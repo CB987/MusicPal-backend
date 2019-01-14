@@ -36,7 +36,7 @@ class Artist {
     //         })
     // }
 
-     static addArtistToUser(name, user_id) {
+    static addArtistToUser(name, user_id) {
         return db.one(`
         INSERT into artists
         (name)
@@ -44,22 +44,22 @@ class Artist {
         ($1)
         returning id
         `, [name])
-        .then(data => {
-            const a = new Artist(data.id, name)
-            return a
-        })
-        .then((a) => {
-            return db.one(`
+            .then(data => {
+                const a = new Artist(data.id, name)
+                return a
+            })
+            .then((a) => {
+                return db.one(`
             INSERT into user_artists
             (user_id, artist_id)
             VALUES
             ($1, $2)
             returning id
-            `, [user_id, a.id ])
-                .then(result => {
-                    console.log(result)
-                })
-        })
+            `, [user_id, a.id])
+                    .then(result => {
+                        console.log(result)
+                    })
+            })
     }
 
     //========
@@ -95,6 +95,16 @@ class Artist {
                 }));
                 return artistsArray
             })
+    }
+
+    //======
+    //DELETE
+    //======
+    static deleteArtistFromUser(artist_id, user_id) {
+        return db.one(`
+        DELETE from user_artists
+        WHERE artist_id = $1 && user_id = $2
+        `, [artist_id, user_id])
     }
 }
 

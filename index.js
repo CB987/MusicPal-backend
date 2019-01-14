@@ -98,7 +98,7 @@ app.post('/API/register', (req, res) => {
                         res.json({ status: "good to go" })
                     })
                 })
-               
+
         });
 });
 
@@ -132,7 +132,7 @@ app.post('/API/login', (req, res) => {
 // =====================
 // User Profile
 // =====================
-app.post('/API/profile', protectRoute, (req, res) => {
+app.get('/API/profile', protectRoute, (req, res) => {
 
     User.getUserById(req.session.user.id)
         .then(user => {
@@ -203,7 +203,6 @@ app.post('/palFriends', (req, res) => {
 })
 //UPDATE USER INFO
 app.post('/updateUser', (req, res) => {
-
     User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
         .then(newUser => {
             res.send(newUser);
@@ -271,6 +270,19 @@ app.post('/palArtists', (req, res) => {
             console.error(error)
         })
 });
+
+//DELETE ARTIST FROM USER_ARTISTS
+app.post('/deleteArtistFromUser', (req, res) => {
+    console.log('wake up! i\'m deleting artists!')
+    Artist.deleteArtistFromUser(req.body.artist_id, req.session.user.id)
+        .then(artists => {
+            res.send(artists);
+            console.log(`${req.session.user.name} don't need no stinkin artists`);
+        })
+        .catch(error => {
+            console.error(error)
+        })
+})
 
 //===================
 // Artists from API
