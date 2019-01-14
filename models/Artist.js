@@ -103,7 +103,7 @@ class Artist {
     static deleteArtistFromUser(artist_id, user_id) {
         return db.one(`
         DELETE from user_artists
-        WHERE artist_id = $1 && user_id = $2
+        WHERE (artist_id = $1 AND user_id = $2)
         `, [artist_id, user_id])
     }
 }
