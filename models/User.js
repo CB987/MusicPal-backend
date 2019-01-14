@@ -149,15 +149,18 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo(name, username, pwhash, email, home, likes, dislikes, pal) {
+    static updateUserInfo(id, name, username, pwhash, email, home, likes, dislikes, pal) {
         return db.result(`
         UPDATE users
-            SET name = $2, username = $3, email = $4, home = $5
+            SET name = $2, username = $3, email = $4, home = $5, likes = $6, dislikes = $7, pal = $8
             WHERE id= $1;
-        `, [this.id, name, username, pwhash, email, home, likes, dislikes, pal])
-            .then(result => {
-                console.log(result)
+        `, [id, name, username, pwhash, email, home, likes, dislikes, pal])
+            .then(userObj => {
+                let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home, userObj.likes, userObj.dislikes, userObj.pal);
+                // console.log(u);
+                return u;
             })
+
     };
 
     //======
