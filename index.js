@@ -73,7 +73,7 @@ app.post('/API/register', (req, res) => {
             console.log('theres been an error')
             console.log('new user added')
             const newPassword = req.body.password;
-            const newEmail = req.body.email;
+            const newEmail = req.body.emailAddress;
             const newHome = req.body.home;
             const newName = req.body.name;
             const newLikes = req.body.likes;
@@ -192,7 +192,7 @@ app.post('/palFriends', (req, res) => {
 //UPDATE USER INFO
 app.post('/updateUser', (req, res) => {
 
-    User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.password, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
+    User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
         .then(newUser => {
             res.send(newUser);
         })
