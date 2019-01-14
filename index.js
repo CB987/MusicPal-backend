@@ -221,7 +221,7 @@ app.get('/deleteAll', (req, res) => {
 const Artist = require('./models/Artist');
 
 // GET USER'S FAVORITE ARTISTS
-app.post('/myArtists', (req, res) => {
+app.get('/myArtists', (req, res) => {
     Artist.getArtistsByUser(req.session.user.id)
         .then(artists => {
             res.send(artists);
@@ -300,13 +300,11 @@ app.post('/APIartistList', (req, res) => {
 // ADD ARTIST
 // ==================
 app.post('/addArtistToUser', (req, res) => {
-    Artist.add(req.body.artist)
+
+    Artist.addArtistToUser(req.body.artist, req.session.user.id)
 
 
-        .then(() => {
-            Artist.addArtistToUser(req.session.user.id, req.body.id)
-            console.log('adding to users artists')
-        })
+
     // return info
     // .then (console.log(info)  )          
     // Artist.add(req.body.artist)

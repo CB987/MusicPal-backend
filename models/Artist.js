@@ -23,17 +23,43 @@ class Artist {
             })
     };
 
-    static addArtistToUser(user_id, id) {
+    // addArtistToUser(user_id) {
+    //     return db.one(`
+    //         INSERT INTO user_artists
+    //         (user_id, artist_id)
+    //         VALUES
+    //         ($1, $2)
+    //         returning id
+    //     ` [user_id, this.id])
+    //         .then(result => {
+    //             console.log(result)
+    //         })
+    // }
+
+     static addArtistToUser(name, user_id) {
         return db.one(`
-            INSERT INTO user_artists
+        INSERT into artists
+        (name)
+        VALUES
+        ($1)
+        returning id
+        `, [name])
+        .then(data => {
+            const a = new Artist(data.id, name)
+            return a
+        })
+        .then((a) => {
+            return db.one(`
+            INSERT into user_artists
             (user_id, artist_id)
             VALUES
             ($1, $2)
             returning id
-        ` [user_id, id])
-            .then(result => {
-                console.log(result)
-            })
+            `, [user_id, a.id ])
+                .then(result => {
+                    console.log(result)
+                })
+        })
     }
 
     //========
