@@ -4,7 +4,10 @@ create table users (
     username varchar(20),
     pwhash varchar(100),
     email varchar(50),
-    home varchar(50)
+    home varchar(50),
+    likes text,
+    dislikes text,
+    pal text
 );
 
 create table artists (
@@ -23,18 +26,18 @@ create table events (
 
 create table user_shows (
     id serial primary key,
-    user_id integer references users (id),
-    event_id varchar references events (id)
+    user_id integer references users (id) ON DELETE CASCADE,
+    event_id varchar references events (id) ON DELETE CASCADE
 );
 
 create table user_friends (
     id serial primary key,
-    user_id integer references users (id),
-    friend_id integer references users (id)
+    user_id integer references users (id) ON DELETE CASCADE,
+    friend_id integer references users (id) ON DELETE CASCADE
 );
 
 create table user_artists (
     id serial primary key,
-    user_id integer references users (id),
-    artist_id integer references artists (id)
+    user_id integer references users (id) ON DELETE CASCADE,
+    artist_id integer references artists (id) ON DELETE CASCADE
 );
