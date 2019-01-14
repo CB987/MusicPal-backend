@@ -45,6 +45,17 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/API/user/isValid', (req, res) => {
+    console.log(req.session);
+    console.log(req.session.user);
+    let user = req.session.user;
+    let isLoggedIn = user ? true : false;
+    res.send({
+        isLoggedIn,
+        user
+    })
+})
+
 //============
 //USER METHODS
 //============
@@ -83,7 +94,8 @@ app.post('/API/register', (req, res) => {
                     req.session.save(() => {
                         res.json({ status: "good to go" })
                     })
-                });
+                })
+               
         });
 });
 
@@ -117,7 +129,7 @@ app.post('/API/login', (req, res) => {
 // =====================
 // User Profile
 // =====================
-app.get('/profile', protectRoute, (req, res) => {
+app.post('/API/profile', protectRoute, (req, res) => {
 
     User.getUserById(req.session.user.id)
         .then(user => {
