@@ -207,11 +207,21 @@ app.post('/updateUser', (req, res) => {
     User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
         .then(newUser => {
             res.send(newUser);
+            console.log('user updated?')
         })
-    console.log('user updated?')
 });
 
-
+//ADD USER FRIEND
+app.post('/addToUserFriends', (req, res) => {
+    console.log(req.body.friend_id)
+    User.addFriend(req.session.user.id, req.body.friend_id)
+        .then(newFriend => {
+            res.send(newFriend);
+            console.log('you made a friend!')
+        }).catch(error => {
+            console.error(error)
+        })
+})
 
 //DELETE USER
 //have to delete from all the tables where it is a foreign key first, then delete from user table
