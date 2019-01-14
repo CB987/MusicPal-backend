@@ -3,11 +3,14 @@ insert into users (
     username,
     pwhash,
     email,
-    home
+    home,
+    likes,
+    dislikes,
+    pal
 ) values
-('Amelia', 'amelia', '$2b$10$4a3j3GgFfAPXQAn3aDsst.XuVs58ozNsYfRM3a/LAbCz3HUzpCGoS', 'amelia@amelia.com', 'Decatur, GA'),
-('Jamie',	'jamie',	'$2b$10$hcNfrqNcgDhGCkWb3ZvTJe88umWV5GS7/asFIeeAeOl3KNwsuhiwa',	'jamie@jamie.com',	'Mableton, GA'),
-('Clare', 'clare', '$2b$10$eTwIGAx0ZtzV/ZjVC5n8WunF9YFY1gJKQU5gyEBrdEVsTMRaQ/zbG', 'clare@clare.com', 'Mableton, GA');
+('Amelia', 'amelia', '$2b$10$4a3j3GgFfAPXQAn3aDsst.XuVs58ozNsYfRM3a/LAbCz3HUzpCGoS', 'amelia@amelia.com', 'Decatur, GA', 'cats, piano, doc martens, coffee', 'assholes, pot holes, white pants after labor day', 'yes'),
+('Jamie',	'jamie',	'$2b$10$hcNfrqNcgDhGCkWb3ZvTJe88umWV5GS7/asFIeeAeOl3KNwsuhiwa',	'jamie@jamie.com',	'Mableton, GA', 'animals, all things emo, youtube', 'school, authority', 'yes'),
+('Clare', 'clare', '$2b$10$eTwIGAx0ZtzV/ZjVC5n8WunF9YFY1gJKQU5gyEBrdEVsTMRaQ/zbG', 'clare@clare.com', 'Mableton, GA', 'animals, sleep, coffee, chocolate', 'judgey people, the color pink, politics', 'maybe');
 
 insert into artists (
     name

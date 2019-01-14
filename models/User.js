@@ -7,19 +7,22 @@ const saltRounds = 10;
 // const saltRounds = 10;
 
 class User {
-    constructor(id, name, username, pwhash, email, home) {
+    constructor(id, name, username, pwhash, email, home, likes, dislikes, pal) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.pwhash = pwhash;
         this.email = email;
         this.home = home;
+        this.likes = likes;
+        this.dislikes = dislikes;
+        this.pal = pal
     }
 
     //=======
     // CREATE
     //=======
-    static add(name, username, password, email, home) {
+    static add(name, username, password, email, home, likes, dislikes, pal) {
         const salt = bcrypt.genSaltSync(saltRounds);
         const hash = bcrypt.hashSync(password, salt);
         return db.one(`
@@ -28,9 +31,9 @@ class User {
         VALUES
         ($1, $2, $3, $4, $5)
         returning id
-        `, [name, username, hash, email, home])
+        `, [name, username, hash, email, home, likes, dislikes, pal])
             .then(data => {
-                const u = new User(data.id, name, username, hash, email, home)
+                const u = new User(data.id, name, username, hash, email, home, likes, dislikes, pal)
                 return u;
             })
     };
@@ -70,7 +73,7 @@ class User {
         WHERE id = $1
         `, [id])
             .then(result => {
-                const u = new User(result.id, result.name, result.username, result.pwhash, result.email, result.home);
+                const u = new User(result.id, result.name, result.username, result.pwhash, result.email, result.home, result.likes, result.dislikes, result.pal);
                 return u;
             })
     }
@@ -81,7 +84,7 @@ class User {
             WHERE username = $1
             `, [username])
             .then(result => {
-                return new User(result.id, result.name, result.username, result.pwhash, result.pwhash, result.email, result.home)
+                return new User(result.id, result.name, result.username, result.pwhash, result.email, result.home, result.likes, result.dislikes, result.pal)
             })
     }
 
@@ -104,7 +107,7 @@ class User {
             WHERE id = $1
             `, [userObj.user_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home, userObj.likes, userObj.dislikes, userObj.pal);
                             console.log(u);
                             return u;
                         })
@@ -127,7 +130,7 @@ class User {
                         WHERE id = $1
                     `, [userObj.friend_id])
                         .then(userObj => {
-                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home);
+                            let u = new User(userObj.id, userObj.name, userObj.username, userObj.pwhash, userObj.email, userObj.home, userObj.likes, userObj.dislikes, userObj.pal);
                             // console.log(u);
                             return u;
                         })
@@ -146,12 +149,12 @@ class User {
     //======
     //UPDATE
     //======
-    updateUserInfo(name, username, pwhash, email, home) {
+    updateUserInfo(name, username, pwhash, email, home, likes, dislikes, pal) {
         return db.result(`
         UPDATE users
             SET name = $2, username = $3, email = $4, home = $5
             WHERE id= $1;
-        `, [this.id, name, username, pwhash, email, home])
+        `, [this.id, name, username, pwhash, email, home, likes, dislikes, pal])
             .then(result => {
                 console.log(result)
             })
@@ -160,32 +163,32 @@ class User {
     //======
     //DELETE
     //======
-    deleteUserFromEvent() {
+    static deleteUserFromEvent(id) {
         return db.any(`
         DELETE FROM user_shows 
             WHERE user_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUserFromFriendsUsers() {
+    static deleteUserFromFriendsUsers(id) {
         return db.any(`
-        DELETE FROM friends 
+        DELETE FROM user_friends 
             WHERE user_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUserFromFriendsFriends() {
+    static deleteUserFromFriendsFriends(id) {
         return db.any(`
-        DELETE FROM friends 
+        DELETE FROM user_friends 
             WHERE friend_id = $1;
-        `, [this.id]);
+        `, [id]);
     }
 
-    deleteUser() {
+    static deleteUser(id) {
         return db.result(`
         DELETE FROM users
             WHERE id = $1 ;
-        `, [this.id]);
+        `, [id]);
     }
 }
 

@@ -28,8 +28,9 @@
 <li>Users can block or report another user (have a user agreement to agree to?)</li>
 <li>Chatrooms for bands/ genres?</li>
 <li>Users can keep track of concerts attended in the past and with whom.</li>
-<li></li>
-<li></li>
+<li>Add date range to search field options</li>
+<li>Paginate search results</li>
+<li>Upload user photos</li>
 </ul>
 
-<p>Brought to you by Ameliz Schulz and Clare Barton.</h4>
+<p>Brought to you by Ameliz Schulz and Clare Barton.</p>
