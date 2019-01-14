@@ -132,7 +132,7 @@ app.post('/API/login', (req, res) => {
 // =====================
 // User Profile
 // =====================
-app.post('/API/profile', protectRoute, (req, res) => {
+app.get('/API/profile', protectRoute, (req, res) => {
 
     User.getUserById(req.session.user.id)
         .then(user => {
