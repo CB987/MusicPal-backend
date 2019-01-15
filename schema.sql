@@ -17,7 +17,7 @@ create table artists (
 
 create table events (
     id varchar(18) primary key,
-    artist varchar(50),
+    artist varchar(200),
     venue text,
     city text,
     state text,
