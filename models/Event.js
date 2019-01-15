@@ -28,8 +28,6 @@ class Event {
             })
     }
 
-    // static addEventFromAPI
-
     // ********
     // RETRIEVE
     // ********
