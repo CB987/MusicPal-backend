@@ -216,255 +216,261 @@ app.post('/addToUserFriends', (req, res) => {
         })
 })
 
-//DELETE USER
-app.get('/deleteAll', (req, res) => {
-    console.log('my name is delete')
-    User.deleteUser(req.session.user.id)
-        .then(console.log('you have been deleted and'))
+//DELETE A FRIEND-- TURNS OUT THEY WERE A DOUCHE AFTER ALL
+app.post('/deleteFriend', (req, res) => {
+    User.deleteFriend(req.session.user.id, req.body.pal_id)
+        .then(console.log('so much for friends'))
 
-        .then(res.send('your account has been deleted'))
 
-        .catch(error => {
-            console.error(error)
-        })
-});
+    //DELETE USER
+    app.get('/deleteAll', (req, res) => {
+        console.log('my name is delete')
+        User.deleteUser(req.session.user.id)
+            .then(console.log('you have been deleted and'))
 
-//==============
-//ARTIST METHODS
-//==============
-const Artist = require('./models/Artist');
+            .then(res.send('your account has been deleted'))
 
-// GET USER'S FAVORITE ARTISTS
-app.get('/myArtists', (req, res) => {
-    Artist.getArtistsByUser(req.session.user.id)
-        .then(artists => {
-            res.send(artists);
-            console.log('got me some artists');
-        });
-});
-
-//GET OTHER's FAVE ARTISTS
-app.post('/palArtists', (req, res) => {
-    Artist.getArtistsByUser(req.body.userID)
-        .then(artists => {
-            res.send(artists);
-            console.log('keep their artists closer');
-        })
-        .catch(error => {
-            console.error(error)
-        })
-});
-
-//DELETE ARTIST FROM USER_ARTISTS
-app.post('/deleteArtistFromUser', (req, res) => {
-    console.log('wake up! i\'m deleting artists!')
-    Artist.deleteArtistFromUser(req.body.artist_id, req.session.user.id)
-        .then(artists => {
-            res.send(artists);
-            console.log(`${req.session.user.name} don't need no stinkin artists`);
-        })
-        .catch(error => {
-            console.error(error)
-        })
-})
-
-//===================
-// Artists from API
-//====================
-app.post('/APIartistList', (req, res) => {
-    console.log(req.body.artistSearch)
-    console.log(req.body.searchArtist)
-    let artistSearch = req.body.searchArtist;
-
-    const APIArtists = async () => {
-        try {
-            return await axios.get(`http://ws.audioscrobbler.com/2.0/?`, {
-                params: {
-                    method: `artist.search`,
-                    artist: `${artistSearch}`,
-                    api_key: `${lastfm_key}`,
-                    format: `json`,
-                    limit: `10`
-                }
+            .catch(error => {
+                console.error(error)
             })
-        }
-        catch (error) {
-            console.error(error)
-        }
-    }
+    });
 
-    const artists = (APIArtists()
-        .then(data => {
-            const artistResults = data.data.results.artistmatches.artist
-            // console.log(data.data.results)
-            artistArray = artistResults.map(artistObj => {
-                let a = new Artist(
-                    artistObj.id,
-                    artistObj.name
-                )
-                console.log(a)
-                return a;
+    //==============
+    //ARTIST METHODS
+    //==============
+    const Artist = require('./models/Artist');
+
+    // GET USER'S FAVORITE ARTISTS
+    app.get('/myArtists', (req, res) => {
+        Artist.getArtistsByUser(req.session.user.id)
+            .then(artists => {
+                res.send(artists);
+                console.log('got me some artists');
+            });
+    });
+
+    //GET OTHER's FAVE ARTISTS
+    app.post('/palArtists', (req, res) => {
+        Artist.getArtistsByUser(req.body.userID)
+            .then(artists => {
+                res.send(artists);
+                console.log('keep their artists closer');
             })
-            // res.send(artistResults)
-            console.log('api artists received')
-            return artistArray
-            // return artistArray
-        }))
-        .then(artistArray => {
-            res.send(artistArray)
-        })
-        .catch(error => {
-            console.error(error)
-        })
-});
-
-// ==================
-// ADD ARTIST
-// ==================
-app.post('/addArtistToUser', (req, res) => {
-
-    Artist.addArtistToUser(req.body.artist, req.session.user.id)
-});
-
-//=============
-//EVENT METHODS
-//=============
-const Event = require('./models/Event');
-
-//GET ALL EVENTS
-app.get('/eventList', (req, res) => {
-    Event.getFilteredShows("")
-        .then(results => {
-            res.send(results);
-            console.log('you get ALL the events')
-        })
-});
-
-//GET EVENTS LIST FOR USER LOGGED IN
-app.get('/upcomingShows', (req, res) => {
-    // let id = req.body.userID
-    Event.getShowsForUser(req.session.user.id)
-        .then(shows => {
-            res.send(shows);
-            console.log('got your user shows right here');
-        });
-});
-
-//GET EVENTS LIST FOR OTHER USER
-app.post('/otherShows', (req, res) => {
-    console.log(`${req.body.userID} emmer-effer`)
-    Event.getShowsForUser(req.body.userID)
-        .then(shows => {
-            res.send(shows);
-            console.log('sending other shows');
-        });
-});
-
-//DELETE EVENT FROM USER
-app.post('/deleteEventfromUser', (req, res) => {
-
-    Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
-});
-
-//=============
-//EVENTS FROM API
-//=============
-const APIEvent = require('./models/APIEvent');
-
-app.post('/APIeventList', (req, res) => {
-    console.log(req.body.searchLocation);
-    let location = req.body.searchLocation;
-    let keyword = req.body.searchKeyword;
-    console.log(req.body.searchKeyword);
-    let artist = req.body.searchArtist;
-    console.log(req.body.searchArtist);
-
-    const APIEvents = async () => {
-        try {
-            return await axios.get(`http://api.eventful.com/json/events/search?`, {
-                // app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25
-                params: {
-                    app_key: `${API_KEY}`,
-                    keywords: `concert music ${artist} ${keyword}`,
-                    location: `${location}`,
-                    date: `future`,
-                    page_size: 25,
-                    sort_order: `date`
-                }
+            .catch(error => {
+                console.error(error)
             })
-        }
+    });
 
-        catch (error) {
-            console.error(error)
-        }
-    }
-    const events = (APIEvents()
-        .then(data => {
-            console.log(data.data.total_items);
-            console.log('^^ data ends');
-            let eventArray;
+    //DELETE ARTIST FROM USER_ARTISTS
+    app.post('/deleteArtistFromUser', (req, res) => {
+        console.log('wake up! i\'m deleting artists!')
+        Artist.deleteArtistFromUser(req.body.artist_id, req.session.user.id)
+            .then(artists => {
+                res.send(artists);
+                console.log(`${req.session.user.name} don't need no stinkin artists`);
+            })
+            .catch(error => {
+                console.error(error)
+            })
+    })
 
-            if (data.data.total_items === '0') {
-                console.log('this is the if');
-                eventArray = [{ artist: null }];
-                // return eventArray;
+    //===================
+    // Artists from API
+    //====================
+    app.post('/APIartistList', (req, res) => {
+        console.log(req.body.artistSearch)
+        console.log(req.body.searchArtist)
+        let artistSearch = req.body.searchArtist;
+
+        const APIArtists = async () => {
+            try {
+                return await axios.get(`http://ws.audioscrobbler.com/2.0/?`, {
+                    params: {
+                        method: `artist.search`,
+                        artist: `${artistSearch}`,
+                        api_key: `${lastfm_key}`,
+                        format: `json`,
+                        limit: `10`
+                    }
+                })
             }
-            else {
-                console.log('this is the else');
-                eventArray = data.data.events.event.map(eventObj => {
+            catch (error) {
+                console.error(error)
+            }
+        }
 
-                    let a = new APIEvent(
-                        eventObj.id,
-                        eventObj.title,
-                        eventObj.venue_name,
-                        eventObj.city_name,
-                        eventObj.region_abbr,
-                        eventObj.start_time)
-                    console.log(a);
+        const artists = (APIArtists()
+            .then(data => {
+                const artistResults = data.data.results.artistmatches.artist
+                // console.log(data.data.results)
+                artistArray = artistResults.map(artistObj => {
+                    let a = new Artist(
+                        artistObj.id,
+                        artistObj.name
+                    )
+                    console.log(a)
                     return a;
                 })
+                // res.send(artistResults)
+                console.log('api artists received')
+                return artistArray
+                // return artistArray
+            }))
+            .then(artistArray => {
+                res.send(artistArray)
+            })
+            .catch(error => {
+                console.error(error)
+            })
+    });
+
+    // ==================
+    // ADD ARTIST
+    // ==================
+    app.post('/addArtistToUser', (req, res) => {
+
+        Artist.addArtistToUser(req.body.artist, req.session.user.id)
+    });
+
+    //=============
+    //EVENT METHODS
+    //=============
+    const Event = require('./models/Event');
+
+    //GET ALL EVENTS
+    app.get('/eventList', (req, res) => {
+        Event.getFilteredShows("")
+            .then(results => {
+                res.send(results);
+                console.log('you get ALL the events')
+            })
+    });
+
+    //GET EVENTS LIST FOR USER LOGGED IN
+    app.get('/upcomingShows', (req, res) => {
+        // let id = req.body.userID
+        Event.getShowsForUser(req.session.user.id)
+            .then(shows => {
+                res.send(shows);
+                console.log('got your user shows right here');
+            });
+    });
+
+    //GET EVENTS LIST FOR OTHER USER
+    app.post('/otherShows', (req, res) => {
+        console.log(`${req.body.userID} emmer-effer`)
+        Event.getShowsForUser(req.body.userID)
+            .then(shows => {
+                res.send(shows);
+                console.log('sending other shows');
+            });
+    });
+
+    //DELETE EVENT FROM USER
+    app.post('/deleteEventfromUser', (req, res) => {
+
+        Event.deleteEventfromUserShows(req.body.eventID, req.session.user.id)
+    });
+
+    //=============
+    //EVENTS FROM API
+    //=============
+    const APIEvent = require('./models/APIEvent');
+
+    app.post('/APIeventList', (req, res) => {
+        console.log(req.body.searchLocation);
+        let location = req.body.searchLocation;
+        let keyword = req.body.searchKeyword;
+        console.log(req.body.searchKeyword);
+        let artist = req.body.searchArtist;
+        console.log(req.body.searchArtist);
+
+        const APIEvents = async () => {
+            try {
+                return await axios.get(`http://api.eventful.com/json/events/search?`, {
+                    // app_key=${API_KEY}&keywords=concert+music+${keyword}&location=Atlanta+GA&date=This+Weekend&page_size=25
+                    params: {
+                        app_key: `${API_KEY}`,
+                        keywords: `concert music ${artist} ${keyword}`,
+                        location: `${location}`,
+                        date: `future`,
+                        page_size: 25,
+                        sort_order: `date`
+                    }
+                })
             }
 
-            return eventArray
-            // res.send(eventArray)
-            // }
+            catch (error) {
+                console.error(error)
+            }
+        }
+        const events = (APIEvents()
+            .then(data => {
+                console.log(data.data.total_items);
+                console.log('^^ data ends');
+                let eventArray;
+
+                if (data.data.total_items === '0') {
+                    console.log('this is the if');
+                    eventArray = [{ artist: null }];
+                    // return eventArray;
+                }
+                else {
+                    console.log('this is the else');
+                    eventArray = data.data.events.event.map(eventObj => {
+
+                        let a = new APIEvent(
+                            eventObj.id,
+                            eventObj.title,
+                            eventObj.venue_name,
+                            eventObj.city_name,
+                            eventObj.region_abbr,
+                            eventObj.start_time)
+                        console.log(a);
+                        return a;
+                    })
+                }
+
+                return eventArray
+                // res.send(eventArray)
+                // }
+            })
+
+            .then(eventArray => {
+                res.send(eventArray);
+            })
+            .catch(error => {
+                console.error(error)
+            }))
+        console.log('api call nailed!');
+    });
+
+    app.post('/addShowToDb', (req, res) => {
+        console.log(req.body.artist);
+        console.log(req.session.user.username)
+
+        Event.addEvent(req.body.eventID, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date)
+            .then(() => {
+                User.addUserGoingToShow(req.session.user.id, req.body.eventID)
+                    .then(() => {
+                        res.send('you did it!')
+                    })
+            })
+    });
+
+    // ===============
+    // Logout
+    // ===============
+    app.post('/logout', (req, res) => {
+        req.session.destroy(() => {
+            // console.log('you have logged out')
+            res.redirect('/login')
         })
+    });
 
-        .then(eventArray => {
-            res.send(eventArray);
-        })
-        .catch(error => {
-            console.error(error)
-        }))
-    console.log('api call nailed!');
-});
-
-app.post('/addShowToDb', (req, res) => {
-    console.log(req.body.artist);
-    console.log(req.session.user.username)
-
-    Event.addEvent(req.body.eventID, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date)
-        .then(() => {
-            User.addUserGoingToShow(req.session.user.id, req.body.eventID)
-                .then(() => {
-                    res.send('you did it!')
-                })
-        })
-});
-
-// ===============
-// Logout
-// ===============
-app.post('/logout', (req, res) => {
-    req.session.destroy(() => {
-        // console.log('you have logged out')
-        res.redirect('/login')
-    })
-});
-
-// =============
-// Connexion
-// =============
-app.listen(5000, () => {
-    console.log('Ain\'t we got fun?');
-});
+    // =============
+    // Connexion
+    // =============
+    app.listen(5000, () => {
+        console.log('Ain\'t we got fun?');
+    });

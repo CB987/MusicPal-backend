@@ -169,11 +169,11 @@ class User {
         `, [id]);
     }
 
-    static deleteUserFromFriendsFriends(id) {
+    static deleteFriend(user_id, friend_id) {
         return db.any(`
         DELETE FROM user_friends 
-            WHERE friend_id = $1;
-        `, [id]);
+            WHERE user_id = $1 AND friend_id = $2;
+        `, [user_id, friend_id]);
     }
 
     static deleteUser(id) {
