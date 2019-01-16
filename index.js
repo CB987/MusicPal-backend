@@ -68,13 +68,9 @@ app.get('/API/user/isValid', (req, res) => {
 //============
 const User = require('./models/User');
 
-//ADD USER
-// User.add('Amelia', 'Amelia', 'amelia@amelia.com', 'Decatur', 'GA');
-
 // =====================
 // User registration
 // =====================
-
 app.post('/API/register', (req, res) => {
     const newUsername = req.body.username;
 
@@ -85,7 +81,6 @@ app.post('/API/register', (req, res) => {
                 console.log('this user already exists')
                 res.json({ status: "taken" })
             }
-
         })
         .catch((err) => {
             console.log('theres been an error')
@@ -105,7 +100,6 @@ app.post('/API/register', (req, res) => {
                         res.json({ status: "good to go" })
                     })
                 })
-
         });
 });
 
@@ -116,7 +110,6 @@ app.post('/API/login', (req, res) => {
     const theUsername = req.body.username;
     const thePassword = req.body.password;
     User.getByUsername(theUsername)
-
 
         .then((theUser) => {
             console.log(theUser)
@@ -134,7 +127,6 @@ app.post('/API/login', (req, res) => {
             }
         })
 })
-
 
 // =====================
 // User Profile
@@ -156,9 +148,10 @@ app.get('/myInfo', (req, res) => {
     User.getUserById(res.session.user.id)
         .catch(user => {
             res.send(user);
-            console.log('sending user info like a muthafucka')
+            console.log('sending user info like nobody\'s business')
         })
 })
+
 //GET USERS BY SHOW
 app.post('/showUsers', (req, res) => {
     console.log(req.body.eventID)
@@ -208,11 +201,12 @@ app.post('/palFriends', (req, res) => {
             console.log('keep your friends\' friends close...')
         })
 })
+
 //UPDATE USER INFO
 app.post('/updateUser', (req, res) => {
     User.updateUserInfo(req.session.user.id, req.body.name, req.body.username, req.session.user.pwhash, req.body.email, req.body.home, req.body.likes, req.body.dislikes, req.body.pal)
         .then(newUser => {
-            res.send(newUser);
+            res.redirect('/profile');
             console.log('user updated?')
         })
 });
@@ -230,19 +224,10 @@ app.post('/addToUserFriends', (req, res) => {
 })
 
 //DELETE USER
-//have to delete from all the tables where it is a foreign key first, then delete from user table
 app.get('/deleteAll', (req, res) => {
     console.log('my name is delete')
-    // User.deleteUserFromEvent(req.session.user.id)
-
-    //     .then(User.deleteUserFromFriendsUsers(req.session.user.id))
-
-    //     .then(User.deleteUserFromFriendsFriends(req.session.user.id))
     User.deleteUser(req.session.user.id)
-        .then(
-            console.log('you have been deleted and')
-
-        )
+        .then(console.log('you have been deleted and'))
 
         .then(res.send('your account has been deleted'))
 
@@ -250,7 +235,6 @@ app.get('/deleteAll', (req, res) => {
             console.error(error)
         })
 });
-
 
 //==============
 //ARTIST METHODS
@@ -299,7 +283,6 @@ app.post('/APIartistList', (req, res) => {
     console.log(req.body.searchArtist)
     let artistSearch = req.body.searchArtist;
 
-
     const APIArtists = async () => {
         try {
             return await axios.get(`http://ws.audioscrobbler.com/2.0/?`, {
@@ -312,7 +295,6 @@ app.post('/APIartistList', (req, res) => {
                 }
             })
         }
-
         catch (error) {
             console.error(error)
         }
@@ -326,17 +308,14 @@ app.post('/APIartistList', (req, res) => {
                 let a = new Artist(
                     artistObj.id,
                     artistObj.name
-
                 )
                 console.log(a)
                 return a;
-
             })
             // res.send(artistResults)
             console.log('api artists received')
             return artistArray
             // return artistArray
-
         }))
         .then(artistArray => {
             res.send(artistArray)
@@ -352,50 +331,12 @@ app.post('/APIartistList', (req, res) => {
 app.post('/addArtistToUser', (req, res) => {
 
     Artist.addArtistToUser(req.body.artist, req.session.user.id)
-
-
-
-    // return info
-    // .then (console.log(info)  )          
-    // Artist.add(req.body.artist)
-    //     .then(() => {
-
-    //     })
-    // return info.artist_id
-    //     .then(artist => {
-    //         info.artist_id = artist.id
-    //     })
-    //     .then(() => {
-    //         Artist.addArtistToUser(req.session.user.id, artist.id )
-    //         console.log('artist added to your shows')
-    //     })
-    // .then(thisArtistInstance => {
-    //     thisArtistInstance.addArtistToUser(req.session.user.id, )
-    //     console.log('the universe is expanding')
 });
-
 
 //=============
 //EVENT METHODS
 //=============
 const Event = require('./models/Event');
-
-//GET EVENT BY ARTIST
-// Event.getByArtist('amelia');
-
-// GET EVENT BY EVENT ID
-app.get('/isInDb', (req, res) => {
-
-    Event.getEventById(req.body.eventID)
-    then(existingEvent => {
-        res.send(existingEvent);
-        console.log(`confirm ${event.name} is in db`)
-    })
-
-});
-
-//GET EVENT BY LOCATION
-// Event.getByLocation('atlanta');
 
 //GET ALL EVENTS
 app.get('/eventList', (req, res) => {
@@ -405,17 +346,6 @@ app.get('/eventList', (req, res) => {
             console.log('you get ALL the events')
         })
 });
-
-// //SHOW EVENTS FOR SEARCH RESULTS
-// app.post('/eventList', (req, res) => {
-//     const searchTerm = req.body.searchTerm;
-
-//     Event.getFilteredShows(searchTerm)
-//         .then(results => {
-//             res.send(results);
-//             console.log('hows that for filtered')
-//         })
-// });
 
 //GET EVENTS LIST FOR USER LOGGED IN
 app.get('/upcomingShows', (req, res) => {
@@ -429,7 +359,7 @@ app.get('/upcomingShows', (req, res) => {
 
 //GET EVENTS LIST FOR OTHER USER
 app.post('/otherShows', (req, res) => {
-    console.log(`${req.body.userID} motherfucker`)
+    console.log(`${req.body.userID} emmer-effer`)
     Event.getShowsForUser(req.body.userID)
         .then(shows => {
             res.send(shows);
@@ -448,9 +378,6 @@ app.post('/deleteEventfromUser', (req, res) => {
 //=============
 const APIEvent = require('./models/APIEvent');
 
-// let location;
-// let keyword;
-
 app.post('/APIeventList', (req, res) => {
     console.log(req.body.searchLocation);
     let location = req.body.searchLocation;
@@ -459,11 +386,6 @@ app.post('/APIeventList', (req, res) => {
     let artist = req.body.searchArtist;
     console.log(req.body.searchArtist);
 
-    // })
-
-    // app.get('/APIEventList', (req, res) => {
-    //     console.log(req.body.searchTerm)
-    // keyword = req.body.searchTerm;
     const APIEvents = async () => {
         try {
             return await axios.get(`http://api.eventful.com/json/events/search?`, {
@@ -527,19 +449,7 @@ app.post('/APIeventList', (req, res) => {
 app.post('/addShowToDb', (req, res) => {
     console.log(req.body.artist);
     console.log(req.session.user.username)
-    // let info = APIEvent.addAPIEvent(
-    //     req.body.eventID,
-    //     req.body.artist,
-    //     req.body.venue,
-    //     req.body.city,
-    //     req.body.state,
-    //     req.body.date
-    // )
-    // return Artist.add(req.body.artist)
-    //     .then(artist => {
-    //         info.artist_id = artist.id
-    //     })
-    //     .then(() => {
+
     Event.addEvent(req.body.eventID, req.body.artist, req.body.venue, req.body.city, req.body.state, req.body.date)
         .then(() => {
             User.addUserGoingToShow(req.session.user.id, req.body.eventID)
@@ -549,23 +459,19 @@ app.post('/addShowToDb', (req, res) => {
         })
 });
 
-
-// ==================================================
+// ===============
 // Logout
-// ====================================================
-
+// ===============
 app.post('/logout', (req, res) => {
     req.session.destroy(() => {
         // console.log('you have logged out')
         res.redirect('/login')
     })
-
-
 });
 
-
-
-
+// =============
+// Connexion
+// =============
 app.listen(5000, () => {
-    console.log('what the hell');
+    console.log('Ain\'t we got fun?');
 });

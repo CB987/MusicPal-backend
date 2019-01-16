@@ -3,9 +3,6 @@ const db = require('./db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-// const bcrypt = require('bcrypt');
-// const saltRounds = 10;
-
 class User {
     constructor(id, name, username, pwhash, email, home, likes, dislikes, pal) {
         this.id = id;
@@ -139,13 +136,6 @@ class User {
             })
     };
 
-    // static getUsersByGenre(genre) {
-    //     return db.any(`
-    //     SELECT * FROM users
-    //     WHERE genre = $1
-    //     `, [genre])
-    // }
-
     //======
     //UPDATE
     //======
@@ -160,7 +150,6 @@ class User {
                 // console.log(u);
                 return u;
             })
-
     };
 
     //======
