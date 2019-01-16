@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -24,13 +25,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public/index.html'), function(err) {
-      if (err) {
-        res.status(500).send(err);
-      }
-    });
-  });
+
 // =========================
 // Protecting User Account
 // =========================
@@ -469,6 +464,13 @@ app.post('/logout', (req, res) => {
     })
 });
 
+app.get('/*', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/index.html'), function(err) {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
+  });
 // =============
 // Connexion
 // =============
