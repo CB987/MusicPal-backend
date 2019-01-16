@@ -218,6 +218,13 @@ app.post('/addToUserFriends', (req, res) => {
         })
 })
 
+//DELETE A FRIEND-- TURNS OUT THEY WERE A DOUCHE AFTER ALL
+app.post('/deleteFriend', (req, res) => {
+    User.deleteFriend(req.session.user.id, req.body.friend_id)
+        .then(console.log('so much for friends'));
+});
+
+
 //DELETE USER
 app.get('/deleteAll', (req, res) => {
     console.log('my name is delete')
